@@ -11,7 +11,6 @@ namespace GTI_Solutionx.Controllers
 {
     public class HomeController : Controller
     {
-        [Authorize(Roles = "Admin, User")]
         public IActionResult Index()
         {
             return View();
@@ -21,14 +20,6 @@ namespace GTI_Solutionx.Controllers
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        [Authorize(Roles = "Admin")]
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
 
             return View();
         }
