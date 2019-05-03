@@ -19,4 +19,11 @@ namespace GTI_Solutionx.Models.AccountViewModels
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
+
+    public enum Users
+    {
+        Admin,
+        Pending,
+        user
+    }
 }

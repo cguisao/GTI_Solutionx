@@ -2,35 +2,250 @@
 @using GTI_Solutionx.Models
 
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <!DOCTYPE html>
-<html>
 <head>
-    @*<link rel="stylesheet" href="assets/plugins/metro/MetroJs.min.css">
-    <link rel="stylesheet" href="assets/plugins/morris/morris.css">
-    <link href="assets/plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
-
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="assets/plugins/animate/animate.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/style.css" rel="stylesheet" type="text/css">*@
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GTI_Solutionx</title>
+    <link rel="shortcut icon" href="~/assets/images/favicon.ico">
 </head>
-<body>
-    @RenderBody()
-    <hr />
+ 
+@if (SignInManager.IsSignedIn(User))
+{
+    var currentUser = await UserManager.GetUserAsync(User);
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    ©2017 Designed by GTI Solutionx LLC.
+    var isAdmin = currentUser != null
+        && await UserManager.IsInRoleAsync(
+            currentUser,
+            Users.Admin.ToString());
+
+    var user = await UserManager.GetUserAsync(User);
+
+    var isUser = currentUser != null
+        && (await UserManager.IsInRoleAsync(
+            currentUser,
+            Users.Admin.ToString())
+            || await UserManager.IsInRoleAsync(
+                currentUser,
+                Users.user.ToString()));
+
+    <head>
+        <link rel="stylesheet" href="assets/plugins/metro/MetroJs.min.css">
+        <link rel="stylesheet" href="assets/plugins/morris/morris.css">
+        <link href="assets/plugins/jvectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet">
+
+        @*<link rel="stylesheet" href="https://rawgit.com/enyo/dropzone/master/dist/dropzone.css">*@
+
+        <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        @*<link href="~/assets/plugins/animate/animate.css" rel="stylesheet" type="text/css">*@
+        <link href="~/assets/css/icons.css" rel="stylesheet" type="text/css">
+        <link href="~/assets/css/style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        <header id="topnav">
+
+            <div class="topbar-main">
+                <div class="menu-extras topbar-custom">
+                    <ul class="list-inline float-right mb-0 ">
+                        <li class="list-inline-item dropdown notification-list">
+                            <div class="dropdown notification-list nav-pro-img">
+                                <a class="dropdown-toggle nav-link arrow-none waves-effect waves-light nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                                    <img src="~/assets/images/users/avatar-1.jpg" alt="user" class="rounded-circle">
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
+                                    <!-- item-->
+                                    <div class="dropdown-item noti-title">
+                                        <h5>Welcome!</h5>
+                                    </div>
+                                    <a asp-area="" class="dropdown-item" asp-controller="Manage" asp-action="ChangePassword"><i class="mdi mdi-account-circle m-r-5"></i>Change Password</a>
+                                    <div class="dropdown-divider"></div>
+                                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
+                                        <button type="submit" class="btn btn-link navbar-btn navbar-link">
+                                            <div class="dropdown-item text-danger" href="#"><i class="mdi mdi-power text-danger"></i>Logout</div>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </footer>
-    <!-- End Footer -->
+            
+            <!-- MENU Start -->
+            <div class="navbar-custom">
+                <div class="container-fluid">
 
-    @RenderSection("Scripts", required: false)
-</body>
+                    <div id="navigation">
+                        <!-- Navigation Menu-->
+                        <ul class="navigation-menu">
+
+                            <li class="has-submenu">
+                                <a asp-controller="Home" asp-action="Index"><i class="mdi mdi-airplay"></i> @UserManager.GetUserName(User)</a>
+                            </li>
+                            @if (isUser)
+                            {
+                            @if (isAdmin)
+                            {
+                                <li class="has-submenu">
+                                    <a href="#"><i class="mdi mdi-gauge"></i>Wholesalers</a>
+                                    <ul class="submenu">
+
+                                        <li class="has-submenu">
+                                            <a href="#">Fragrancex</a>
+                                            <ul class="submenu">
+                                                <li><a asp-area="" asp-controller="Shopify" asp-action="Update">API Database Update</a></li>
+                                                <li><a asp-area="" asp-controller="Shopify" asp-action="UpdateExcel">Excel DB Update</a></li>
+                                                <li><a asp-area="" asp-controller="Upc" asp-action="Upcs">UPC Upload</a></li>
+                                            </ul>
+                                        </li>
+
+                                        <li class="has-submenu">
+                                            <a href="#">AzImporter</a>
+                                            <ul class="submenu">
+                                                <li><a asp-area="" asp-controller="AzImporter" asp-action="Index">Excel Upload</a></li>
+                                                <li><a asp-area="" asp-controller="AzImporter" asp-action="Shipping">Shipping Modifier</a></li>
+                                            </ul>
+                                        </li>
+
+                                        <li class="has-submenu">
+                                            <a href="#">Perfume WorldWide</a>
+                                            <ul class="submenu">
+                                                <li><a asp-area="" asp-controller="PerfumeWorldWide" asp-action="Index">Excel Comparer</a></li>
+                                                <li><a asp-area="" asp-controller="PerfumeWorldWide" asp-action="UpdateExcel">Excel DB Upload</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                            <li class="has-submenu">
+                                <a href="#"><i class="mdi mdi-gauge"></i>Inventory Tracker</a>
+                                <ul class="submenu">
+                                    <li class="has-submenu">
+                                        <a href="#">Amazon</a>
+                                        <ul class="submenu">
+                                            <li><a asp-area="" asp-controller="Amazon" asp-action="Index">Inventory Checker</a></li>
+                                            <li><a asp-area="" asp-controller="Amazon" asp-action="Upload">Listing Checker</a></li>
+                                            <li><a asp-area="" asp-controller="Amazon" asp-action="BlackList">Black List</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="has-submenu">
+                                        <a href="#">Shopify</a>
+                                        <ul class="submenu">
+                                            <li><a asp-area="" asp-controller="Shopify" asp-action="Index">Download Report</a></li>
+                                            <li><a asp-area="" asp-controller="Shopify" asp-action="Upload">Update DB</a></li>
+                                            <li><a asp-area="" asp-controller="Shopify" asp-action="Delete">Delete DB</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a asp-area="" asp-controller="FrogInk" asp-action="Index">Frog Ink</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="has-submenu">
+                                <a href="#"><i class="mdi mdi-gauge"></i>Profile</a>
+                                <ul class="submenu">
+                                    <li><a asp-area="" asp-controller="Profile" asp-action="Index">Profile Creator</a></li>
+                                    <li><a asp-area="" asp-controller="Profile" asp-action="Profile">Profile Viewer</a></li>
+                                    <li><a asp-area="" asp-controller="Profile" asp-action="Title">eBay Title Creator</a></li>
+                                </ul>
+                            </li>
+                            }
+                            <li class="has-submenu"></li>
+                        </ul>
+                        <!-- End navigation menu -->
+                    </div> <!-- end navigation -->
+                </div> <!-- end container -->
+             </div> <!-- end navbar-custom -->
+        </header>
+        
+        @RenderBody()
+            
+        @RenderSection("Scripts", required: false)
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        © 2018 Designed by GTI Solutionx LLC.
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- End Footer -->
+        <!-- jQuery  -->
+        <script src="~/assets/js/jquery.min.js"></script>
+        <script src="~/assets/js/popper.min.js"></script>
+        <script src="~/assets/js/bootstrap.min.js"></script>
+        <script src="~/assets/js/modernizr.min.js"></script>
+        <script src="~/assets/js/detect.js"></script>
+        <script src="~/assets/js/fastclick.js"></script>
+        <script src="~/assets/js/jquery.slimscroll.js"></script>
+        <script src="~/assets/js/jquery.blockUI.js"></script>
+        <script src="~/assets/js/waves.js"></script>
+        <script src="~/assets/js/jquery.nicescroll.js"></script>
+        <script src="~/assets/js/jquery.scrollTo.min.js"></script>
+
+        <!-- Required datatable js -->
+        <script src="~/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/assets/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+        <!-- Buttons examples -->
+        <script src="~/assets/plugins/datatables/dataTables.buttons.min.js"></script>
+        <script src="~/assets/plugins/datatables/buttons.bootstrap4.min.js"></script>
+        <script src="~/assets/plugins/datatables/jszip.min.js"></script>
+        <script src="~/assets/plugins/datatables/pdfmake.min.js"></script>
+        <script src="~/assets/plugins/datatables/vfs_fonts.js"></script>
+        <script src="~/assets/plugins/datatables/buttons.html5.min.js"></script>
+        <script src="~/assets/plugins/datatables/buttons.print.min.js"></script>
+        <script src="~/assets/plugins/datatables/buttons.colVis.min.js"></script>
+        <!-- Responsive examples -->
+        <script src="~/assets/plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="~/assets/plugins/datatables/responsive.bootstrap4.min.js"></script>
+
+        <!-- Datatable init js -->
+        <script src="~/assets/pages/datatables.init.js"></script>
+
+        <!-- App js -->
+        <script src="~/assets/js/app.js"></script>
+
+        <!-- Plugings for the main dashboard-->
+        <script src="~/assets/plugins/metro/MetroJs.min.js"></script>
+        <script src="~/assets/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js"></script>
+        <script src="~/assets/plugins/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+        <script src="~/assets/plugins/sparkline-chart/jquery.sparkline.min.js"></script>
+        <script src="~/assets/plugins/morris/morris.min.js"></script>
+        <script src="~/assets/plugins/raphael/raphael-min.js"></script>
+        <script src="~/assets/pages/dashboard.js"></script>
+
+        <script src="https://rawgit.com/enyo/dropzone/master/dist/dropzone.js"></script>
+
+    </body>
+}
+else
+{
+    <head>
+        <link href="~/assets/plugins/animate/animate.css" rel="stylesheet" type="text/css">
+        <link href="~/assets/css/icons.css" rel="stylesheet" type="text/css">
+        <link href="~/assets/css/style.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+        @RenderBody()
+
+        <hr />
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12">
+                        © 2018 Designed by GTI Solutionx LLC.
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!-- End Footer -->
+
+        @RenderSection("Scripts", required: false)
+    </body>
+}
 </html>

@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GTI_Solutionx", "GTI_Solutionx\GTI_Solutionx.csproj", "{D12E7B46-34C0-4B65-88F4-94769A8C4C17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GTI_Solutionx", "GTI_Solutionx\GTI_Solutionx.csproj", "{D12E7B46-34C0-4B65-88F4-94769A8C4C17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrgxPublicApiSDK", "FrgxPublicApiSDK\FrgxPublicApiSDK.csproj", "{D19F2EAE-E58E-4069-B10C-BFB3A47C4F32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D12E7B46-34C0-4B65-88F4-94769A8C4C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D12E7B46-34C0-4B65-88F4-94769A8C4C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D12E7B46-34C0-4B65-88F4-94769A8C4C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D19F2EAE-E58E-4069-B10C-BFB3A47C4F32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D19F2EAE-E58E-4069-B10C-BFB3A47C4F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D19F2EAE-E58E-4069-B10C-BFB3A47C4F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D19F2EAE-E58E-4069-B10C-BFB3A47C4F32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

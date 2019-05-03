@@ -14,6 +14,7 @@ using GTI_Solutionx.Models;
 using GTI_Solutionx.Models.AccountViewModels;
 using GTI_Solutionx.Services;
 using Microsoft.Extensions.DependencyInjection;
+using GTI_Solutionx.Code;
 
 namespace GTI_Solutionx.Controllers
 {
@@ -227,15 +228,19 @@ namespace GTI_Solutionx.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
                     await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    await CreateUserRoles(model.Email, "User");
+                    await CreateUserRoles(model.Email, Users.Pending.ToString());
                     _logger.LogInformation("User created a new account with password.");
+                    Helper helper = new Helper();
+                    
+                    helper.sendEmail("smtp.gmail.com", 587, "gtisolutions49@gmail.com", "lotero321"
+                        , "gtisolutions49@gmail.com", model.Email, "User " + model.Email + " has register. Login and give access if seemed fit."
+                        , "New Register User");
+
                     return RedirectToLocal(returnUrl);
                 }
                 AddErrors(result);

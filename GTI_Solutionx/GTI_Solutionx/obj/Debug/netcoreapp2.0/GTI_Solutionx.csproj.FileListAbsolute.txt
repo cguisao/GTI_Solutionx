@@ -17,7 +17,6 @@ D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\bin\Debug\netcoreapp2
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\bin\Debug\netcoreapp2.0\GTI_Solutionx.pdb
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\GTI_Solutionx.csprojResolveAssemblyReference.cache
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\GTI_Solutionx.csproj.CoreCompileInputs.cache
-D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\UserSecretsAssemblyInfo.cs
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\GTI_Solutionx.AssemblyInfoInputs.cache
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\GTI_Solutionx.AssemblyInfo.cs
 D:\GTI Solutions\GTI_Solutionx\GTI_Solutionx\GTI_Solutionx\obj\Debug\netcoreapp2.0\GTI_Solutionx.dll
