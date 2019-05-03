@@ -2,16 +2,20 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/GTI_Solutionx",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:57229/",
-      "sslPort": 44351
+      "sslPort": 44376
     }
   },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "https://localhost:44351/",
+      "launchUrl": "https://localhost:44376/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

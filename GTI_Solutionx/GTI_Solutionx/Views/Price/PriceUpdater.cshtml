@@ -1,0 +1,35 @@
+﻿@page
+@model GTI_Solutionx.Controllers.PriceController
+@{
+    ViewBag.Title = "Update";
+}
+<h2>Shopify Updater (Not finished yet!!)</h2>
+
+<h3>eBay Excel creator</h3>
+
+<p>
+    This application is intended to create an excel which will
+    be able to update the prices and available products.
+</p>
+
+<form asp-controller="Price" asp-action="ProductImport" method="post"
+      enctype="multipart/form-data" style="width: 60%">
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <label for="inputEmail4">Items</label>
+            <input type="number" class="form-control" name="items" placeholder="Items" required>
+        </div>
+        <div class="form-group col-md-12">
+            <label for="exampleFormControlFile1">Excel</label>
+        </div>
+        <div class="form-group col-md-12">
+            <input type="file" class="form-control-file" name="file" required>
+        </div>
+        <div class="form-group col-md-12">
+            <button class="form-control-file" type="submit">Upload File</button>
+        </div>
+    </div>
+    <p>
+        Last Fragrancex database update <b>@ViewBag.TimeStamp</b>. <br />
+    </p>
+</form>

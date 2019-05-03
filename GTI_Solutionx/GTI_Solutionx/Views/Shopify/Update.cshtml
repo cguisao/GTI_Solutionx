@@ -1,0 +1,73 @@
+﻿@model IEnumerable<GTI_Solutionx.Models.Dashboard.ServiceTimeStamp>
+@{
+    ViewBag.Title = "Update";
+}
+<head>
+    <!-- DataTables -->
+    <link href="~/assets/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+</head>
+<div class="wrapper">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card m-b-30">
+                    <div class="card-body">
+                        <h2>Fragrancex's database One Click update</h2>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            This application is intended to update the
+                            GTI Solution's Fragrancex database. Such
+                            update includes item price and availability
+                            once a day.
+                        </p>
+
+                        <form asp-controller="Shopify" asp-action="Updatefragrancex" method="post"
+                              enctype="multipart/form-data">
+                            <button class="btn btn-primary" type="submit">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card m-b-30">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Last Updated Date</th>
+                                        <th>Database Update Type</th>
+                                        <th>Wholesaler</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.type)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Wholesalers)
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
