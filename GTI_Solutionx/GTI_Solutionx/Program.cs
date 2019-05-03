@@ -20,6 +20,7 @@ namespace GTI_Solutionx
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseSetting("https_port", "")
                 .Build();
     }
 }
