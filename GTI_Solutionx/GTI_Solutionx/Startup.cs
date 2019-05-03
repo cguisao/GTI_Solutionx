@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using GTI_Solutionx.Data;
 using GTI_Solutionx.Models;
 using GTI_Solutionx.Services;
+using GTI_Solutionx.Models.AccountViewModels;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.Http;
 
 namespace GTI_Solutionx
 {
@@ -29,12 +32,46 @@ namespace GTI_Solutionx
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings.
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 1;
+
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+
+                // User settings.
+                options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = false;
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+                options.LoginPath = "/Identity/Account/Login";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
 
             services.AddMvc();
         }
@@ -53,10 +90,16 @@ namespace GTI_Solutionx
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseAuthentication();
+
             app.UseStaticFiles();
 
-            app.UseAuthentication();
-            
+            app.UseRewriter(new RewriteOptions()
+            .AddRedirectToHttps()
+            );
+
+            //app.UseHttpsRedirection();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -74,17 +117,17 @@ namespace GTI_Solutionx
 
             IdentityResult roleResult;
             //Adding Admin Role
-            var roleCheck = await RoleManager.RoleExistsAsync("Admin");
+            var roleCheck = await RoleManager.RoleExistsAsync(Users.Admin.ToString());
             if (!roleCheck)
             {
                 //create the roles and seed them to the database
-                roleResult = await RoleManager.CreateAsync(new IdentityRole("Admin"));
+                roleResult = await RoleManager.CreateAsync(new IdentityRole(Users.Admin.ToString()));
             }
             //Assign Admin role to the main User here we have given our newly registered 
             //login id for Admin management
-            ApplicationUser user = await UserManager.FindByEmailAsync("info@masterarepa.com");
+            ApplicationUser user = await UserManager.FindByEmailAsync("gtisolutions49@gmail.com");
             var User = new ApplicationUser();
-            await UserManager.AddToRoleAsync(user, "Admin");
+            await UserManager.AddToRoleAsync(user, Users.Admin.ToString());
         }
     }
 }
