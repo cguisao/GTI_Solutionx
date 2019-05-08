@@ -19,7 +19,7 @@ namespace DatabaseModifier
             IConfiguration Configuration;
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-            string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
+            string connectionstring = Configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
             {
@@ -55,7 +55,7 @@ namespace DatabaseModifier
 
             Configuration = builder.Build();
 
-            string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
+            string connectionstring = Configuration.GetConnectionString("DefaultConnection");
 
             using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
             {

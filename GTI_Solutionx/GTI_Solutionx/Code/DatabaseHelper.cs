@@ -77,7 +77,7 @@ namespace GTI_Solutionx.Code
             IConfiguration Configuration;
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-            string connectionstring = Configuration.GetConnectionString("BloggingDatabase");
+            string connectionstring = Configuration.GetConnectionString("DefaultConnection");
             
             using (SqlConnection sourceConnection =
                    new SqlConnection(connectionstring))
