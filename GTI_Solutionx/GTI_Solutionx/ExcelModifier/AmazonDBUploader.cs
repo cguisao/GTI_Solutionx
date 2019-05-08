@@ -26,6 +26,8 @@ namespace ExcelModifier
             setList();
         }
         
+        //public List<Amazon> amazon = 
+
         public void ExcelGenerator()
         {
             FileInfo file = new FileInfo(path);
@@ -85,6 +87,7 @@ namespace ExcelModifier
                                         if (!isInDB(asin))
                                         {
                                             Amazon amazon = new Amazon();
+                                            amazon.id = amazonList.Count + 1;
                                             amazon.Asin = asin;
                                             skuID = DigitGetter(rowSku);
                                             if(skuID == 0)
@@ -93,6 +96,8 @@ namespace ExcelModifier
                                             amazon.wholesaler = Wholesalers.Fragrancex.ToString();
                                             amazon.blackList = false;
                                             amazonList.Add(asin, amazon);
+
+                                            amazonPrintList.Add(amazon);
                                         }
                                     }
                                     else if (isAzImporter(rowSku))
@@ -100,6 +105,7 @@ namespace ExcelModifier
                                         if (!isInDB(asin))
                                         {
                                             Amazon amazon = new Amazon();
+
                                             amazon.Asin = asin;
                                             sellingPrice = getSellingPrice();
                                             amazon.sku = azImporter.Sku.ToUpper();
@@ -107,6 +113,8 @@ namespace ExcelModifier
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
                                             amazon.blackList = false;
                                             amazonList.Add(asin, amazon);
+
+                                            amazonPrintList.Add(amazon);
                                         }
                                     }
                                 }
@@ -224,7 +232,7 @@ namespace ExcelModifier
 
         public Dictionary<string, Amazon> amazonList { get; set; }
 
-        private List<Amazon> amazonPrintList { get; set; }
+        public List<Amazon> amazonPrintList { get; set; }
         
     }
 }

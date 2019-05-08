@@ -1,4 +1,5 @@
 ﻿using DatabaseModifier;
+using EFCore.BulkExtensions;
 using ExcelModifier;
 using GTI_Solutionx.Code;
 using GTI_Solutionx.Data;
@@ -107,29 +108,6 @@ namespace GTI_Solutionx.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            //SetDictionariesAsync();
-
-            //amazonList = _context.Amazon.ToList();
-
-            //var tasks = new List<Task>();
-
-            ////Task amazonListTask = new Task(() => amazonList = _context.Amazon.ToList());
-
-            //Task amazonItemsTask = new Task(() => amazonItems = amazonList.ToDictionary(x => x.Asin, y => y.sku));
-
-            //Task amazonList2Task = new Task(() => amazonList2 = _context.Amazon.ToList());
-
-            ////tasks.Add(amazonListTask);
-
-            //tasks.Add(amazonItemsTask);
-
-            //tasks.Add(amazonList2Task);
-
-            //Parallel.ForEach(tasks, task =>
-            //{
-            //    task.RunSynchronously();
-            //});
-
             var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
 
             var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
@@ -151,30 +129,15 @@ namespace GTI_Solutionx.Controllers
             {
                 return null;
             }
-            finally
+
+            using (var tran = _context.Database.BeginTransaction())
             {
-                //using (var con = _context.Database.GetDbConnection())
-                //{
-                //    using (var cmd = con.CreateCommand())
-                //    {
-                //        cmd.CommandText = "select f1, f2 from table";
-
-                //        using (var rdr = cmd.ExecuteReader())
-                //        {
-                //            var f1 = rdr.GetInt32(0);
-                //            var f2 = rdr.GetInt32(1`);
-                //        }
-                //    }
-                //}
-
-                // Upload to the DB
-
-                DBModifierAmazon dBModifierAmazon = new DBModifierAmazon(amazonDBUploader.amazonList);
-
-                dBModifierAmazon.TableExecutor();
+                await _context.BulkInsertOrUpdateAsync(amazonDBUploader.amazonPrintList);
+                tran.Commit();
             }
-            
+
             var memory = new MemoryStream();
+
             using (var stream = new FileStream(path, FileMode.Open))
             {
                 await stream.CopyToAsync(memory);
