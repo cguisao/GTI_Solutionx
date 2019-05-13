@@ -7,7 +7,7 @@ using System.IO;
 
 namespace DatabaseModifier
 {
-    public class DBModifierFragrancexExcel : Database, IDatabaseModifier
+    public class DBModifierFragrancexExcel
     {
         public DBModifierFragrancexExcel(string path, Dictionary<int, long?> upc)
         {
@@ -15,49 +15,19 @@ namespace DatabaseModifier
             this.upc = upc;
         }
 
+        public List<Fragrancex> fragancexList = new List<Fragrancex>();
+
         private string path { get; set; }
 
         private Dictionary<int, long?> upc { get; set; }
-
-        public DataTable CreateTable()
-        {
-            DataTable fragrancexTable = new DataTable("Fragrancex");
-
-            ColumnMaker(fragrancexTable, "ItemID", "System.Int32");
-            ColumnMaker(fragrancexTable, "BrandName", "System.String");
-            ColumnMaker(fragrancexTable, "Description", "System.String");
-            ColumnMaker(fragrancexTable, "Gender", "System.String");
-            ColumnMaker(fragrancexTable, "Instock", "System.Boolean");
-            ColumnMaker(fragrancexTable, "LargeImageUrl", "System.String");
-            ColumnMaker(fragrancexTable, "MetricSize", "System.String");
-            ColumnMaker(fragrancexTable, "ParentCode", "System.String");
-            ColumnMaker(fragrancexTable, "ProductName", "System.String");
-            ColumnMaker(fragrancexTable, "RetailPriceUSD", "System.Int32");
-            ColumnMaker(fragrancexTable, "Size", "System.String");
-            ColumnMaker(fragrancexTable, "SmallImageURL", "System.String");
-            ColumnMaker(fragrancexTable, "Type", "System.String");
-            ColumnMaker(fragrancexTable, "Upc", "System.Int64");
-            ColumnMaker(fragrancexTable, "WholePriceAUD", "System.Double");
-            ColumnMaker(fragrancexTable, "WholePriceCAD", "System.Double");
-            ColumnMaker(fragrancexTable, "WholePriceEUR", "System.Double");
-            ColumnMaker(fragrancexTable, "WholePriceGBP", "System.Double");
-            ColumnMaker(fragrancexTable, "WholePriceUSD", "System.Double");
-            ColumnMaker(fragrancexTable, "UpcItemID", "System.Double"); 
-
-            return fragrancexTable;
-        }
-
+        
         public virtual void TableExecutor()
         {
             
             List<UPC> list = new List<UPC>();
 
             FileInfo file = new FileInfo(path);
-
-            DataTable uploadFragrancex = CreateTable();
-
-            int bulkSize = 0;
-
+            
             int exception = 0;
 
             try
@@ -108,36 +78,33 @@ namespace DatabaseModifier
                         {
                             exception++;
 
-                            DataRow insideRow = uploadFragrancex.NewRow();
+                            Fragrancex fran = new Fragrancex();
 
-                            insideRow["ItemID"] = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
-                            insideRow["BrandName"] = worksheet.Cells[row, brandName].Value?.ToString();
-                            insideRow["Description"] = worksheet.Cells[row, description].Value?.ToString();
-                            insideRow["Gender"] = null;
-                            insideRow["Instock"] = true;
-                            insideRow["LargeImageUrl"] = worksheet.Cells[row, image].Value?.ToString();
-                            insideRow["MetricSize"] = null;
-                            insideRow["ParentCode"] = null;
-                            insideRow["ProductName"] = null;
-                            insideRow["RetailPriceUSD"] = 0.0;
-                            insideRow["Size"] = null;
-                            insideRow["SmallImageURL"] = null;
-                            insideRow["Type"] = worksheet.Cells[row, type].Value?.ToString();
-                            insideRow["WholePriceAUD"] = 0.0;
-                            insideRow["WholePriceCAD"] = 0.0;
-                            insideRow["WholePriceEUR"] = 0.0;
-                            insideRow["WholePriceGBP"] = 0.0;
-                            insideRow["WholePriceUSD"] = Convert.ToDouble(worksheet.Cells[row, price].Value?.ToString());
+                            fran.ItemID = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
+                            fran.BrandName = worksheet.Cells[row, brandName].Value?.ToString();
+                            fran.Description = worksheet.Cells[row, description].Value?.ToString();
+                            fran.Gender = null;
+                            fran.Instock = true;
+                            fran.LargeImageUrl = worksheet.Cells[row, image].Value?.ToString();
+                            fran.MetricSize = null;
+                            fran.ParentCode = null;
+                            fran.ProductName = null;
+                            fran.RetailPriceUSD = 0.0;
+                            fran.Size = null;
+                            fran.SmallImageURL = null;
+                            fran.Type = worksheet.Cells[row, type].Value?.ToString();
+                            fran.WholePriceAUD = 0.0;
+                            fran.WholePriceCAD = 0.0;
+                            fran.WholePriceEUR = 0.0;
+                            fran.WholePriceGBP = 0.0;
+                            fran.WholePriceUSD = Convert.ToDouble(worksheet.Cells[row, price].Value?.ToString());
 
                             if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString())), out value))
                             {
-                                insideRow["Upc"] = value;
+                                fran.Upc = value;
                             }
 
-                            uploadFragrancex.Rows.Add(insideRow);
-                            uploadFragrancex.AcceptChanges();
-
-                            bulkSize++;
+                            fragancexList.Add(fran);
                         }
 
                     }
@@ -147,8 +114,6 @@ namespace DatabaseModifier
             {
                 throw (ex);
             }
-
-            upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
         }
     }
 }
