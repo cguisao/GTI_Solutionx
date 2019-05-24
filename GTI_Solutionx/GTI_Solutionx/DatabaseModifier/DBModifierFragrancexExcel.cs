@@ -15,7 +15,7 @@ namespace DatabaseModifier
             this.upc = upc;
         }
 
-        public List<Fragrancex> fragancexList = new List<Fragrancex>();
+        public List<Wholesaler_Fragrancex> fragancexList = new List<Wholesaler_Fragrancex>();
 
         private string path { get; set; }
 
@@ -78,9 +78,10 @@ namespace DatabaseModifier
                         {
                             exception++;
 
-                            Fragrancex fran = new Fragrancex();
+                            Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
 
-                            fran.ItemID = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
+                            fran.id = exception;
+                            fran.Sku = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
                             fran.BrandName = worksheet.Cells[row, brandName].Value?.ToString();
                             fran.Description = worksheet.Cells[row, description].Value?.ToString();
                             fran.Gender = null;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using FrgxPublicApiSDK.Models;
+using GTI_Solutionx.Models.Dashboard;
 
 namespace DatabaseModifier
 {
@@ -16,16 +17,16 @@ namespace DatabaseModifier
 
         public List<Product> allProducts { get; set; }
 
+        public List<Wholesaler_Fragrancex> fragrancex = new List<Wholesaler_Fragrancex>();
+
         public override void TableExecutor()
 
         {
             long? value = 0;
 
-            int bulkSize = 0;
+            int bulkSize = 1;
 
             Dictionary<string, string> dic = new Dictionary<string, string>();
-
-            DataTable uploadFragrancex = CreateTable();
 
             foreach (var product in allProducts)
             {
@@ -34,47 +35,49 @@ namespace DatabaseModifier
                     dic.Add(product.ItemId, product.ProductName);
                     if (product != null)
                     {
-                        DataRow insideRow = uploadFragrancex.NewRow();
+                        Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
 
-                        insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
-                        insideRow["BrandName"] = product.BrandName;
-                        insideRow["Description"] = product.Description;
-                        insideRow["Gender"] = product.Gender;
-                        insideRow["Instock"] = product.Instock;
-                        insideRow["LargeImageUrl"] = product.LargeImageUrl;
-                        insideRow["MetricSize"] = product.MetricSize;
-                        insideRow["ParentCode"] = product.ParentCode;
-                        insideRow["ProductName"] = product.ProductName;
-                        insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
-                        insideRow["Size"] = product.Size;
-                        insideRow["SmallImageURL"] = product.SmallImageUrl;
-                        insideRow["Type"] = product.Type;
-                        insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
-                        insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
-                        insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
-                        insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
-                        insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
+                        fran.id = bulkSize + 1;
+                        fran.Sku = Convert.ToInt32(product.ItemId);
+                        fran.BrandName = product.BrandName;
+                        fran.Description = product.Description;
+                        fran.Gender = product.Gender;
+                        fran.Instock = product.Instock;
+                        fran.LargeImageUrl = product.LargeImageUrl;
+                        fran.MetricSize = product.MetricSize;
+                        fran.ParentCode = product.ParentCode;
+                        fran.ProductName = product.ProductName;
+                        fran.RetailPriceUSD = product.RetailPriceUSD;
+                        fran.Size = product.Size;
+                        fran.SmallImageURL = product.SmallImageUrl;
+                        fran.Type = product.Type;
+                        fran.WholePriceAUD = product.WholesalePriceAUD;
+                        fran.WholePriceCAD = product.WholesalePriceCAD;
+                        fran.WholePriceEUR = product.WholesalePriceEUR;
+                        fran.WholePriceGBP = product.WholesalePriceGBP;
+                        fran.WholePriceUSD = product.WholesalePriceUSD;
 
                         if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
                         {
-                            insideRow["Upc"] = value;
+                            fran.Upc = value;
                         }
 
-                        insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
-
-                        uploadFragrancex.Rows.Add(insideRow);
-                        uploadFragrancex.AcceptChanges();
-                        bulkSize++;
+                        fragrancex.Add(fran);
                     }
                 }
                 catch
                 {
-                    continue;
+                    throw;
                 }
             }
 
-            upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
+            //upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
 
+        }
+
+        public DataTable CreateTable()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -14,7 +14,5 @@ namespace GTI_Solutionx.Models.Dashboard
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ItemID { get; set; }
         public long? Upc { get; set; }
-
-        public List<Fragrancex> fragrancex { get; set; }
     }
 }

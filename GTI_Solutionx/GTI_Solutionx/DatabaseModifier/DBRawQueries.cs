@@ -42,7 +42,7 @@ namespace DatabaseModifier
 
         }
 
-        public Fragrancex getFragrancex2(string itemID)
+        public Wholesaler_Fragrancex getFragrancex2(string itemID)
         {
             var builder = new ConfigurationBuilder()
                              .SetBasePath(Directory.GetCurrentDirectory())
@@ -67,11 +67,11 @@ namespace DatabaseModifier
 
                 SqlDataReader reader = commandSourceData.ExecuteReader();
 
-                Fragrancex fragrancex = new Fragrancex();
+                Wholesaler_Fragrancex fragrancex = new Wholesaler_Fragrancex();
 
                 while (reader.Read())
                 {
-                    fragrancex.ItemID = Convert.ToInt32(reader[0]);
+                    fragrancex.Sku = Convert.ToInt32(reader[0]);
                     fragrancex.BrandName = reader[1].ToString();
                     fragrancex.Description = reader[2].ToString();
                     fragrancex.Gender = reader[3].ToString();

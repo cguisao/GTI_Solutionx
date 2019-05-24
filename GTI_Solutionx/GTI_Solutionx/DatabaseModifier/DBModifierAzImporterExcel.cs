@@ -9,7 +9,7 @@ namespace DatabaseModifier
 {
     public class DBModifierAzImporterExcel : Database, IDatabaseModifier
     {
-        public DBModifierAzImporterExcel(string _path, Dictionary<string, AzImporter> _azImportItems)
+        public DBModifierAzImporterExcel(string _path, Dictionary<string, Wholesaler_AzImporter> _azImportItems)
         {
             path = _path;
             azImportItems = _azImportItems;
@@ -17,7 +17,9 @@ namespace DatabaseModifier
 
         private string path { set; get; }
 
-        private Dictionary<string, AzImporter> azImportItems { get; set; }
+        private Dictionary<string, Wholesaler_AzImporter> azImportItems { get; set; }
+
+        public List<Wholesaler_AzImporter> azImport = new List<Wholesaler_AzImporter>();
         
         public DataTable CreateTable()
         {
@@ -60,7 +62,7 @@ namespace DatabaseModifier
 
                     for (int row = 1; row <= rowCount; row++)
                     {
-                        AzImporter az = new AzImporter();
+                        Wholesaler_AzImporter az = new Wholesaler_AzImporter();
                         exception++;
                         if(exception == 10)
                         {
@@ -68,7 +70,7 @@ namespace DatabaseModifier
                         }
                         if (row != 1)
                         {
-                            az.ItemID = row - 1;
+                            az.id = row - 1;
                             az.Sku = worksheet.Cells[row, 1].Value?.ToString().ToUpper();
                             az.Category = worksheet.Cells[row, 2].Value?.ToString();
                             az.ItemName = worksheet.Cells[row, 3].Value?.ToString();
@@ -111,41 +113,40 @@ namespace DatabaseModifier
 
             DataTable uploadAzImporter = CreateTable();
 
-            int bulkSize = 0;
+            int bulkSize = 1;
 
             int exception = 0;
 
             foreach(var az in azImportItems)
             {
                 exception++;
-                DataRow insideRow = uploadAzImporter.NewRow();
 
-                insideRow["ItemID"] = bulkSize;
-                insideRow["Sku"] = az.Value.Sku;
-                insideRow["Category"] = az.Value.Category;
-                insideRow["ItemName"] = az.Value.ItemName;
-                insideRow["Image1"] = az.Value.Image1;
-                insideRow["Image2"] = az.Value.Image2;
-                insideRow["Image3"] = az.Value.Image3;
-                insideRow["Image4"] = az.Value.Image4;
-                insideRow["Image5"] = az.Value.Image5;
-                insideRow["Image6"] = az.Value.Image6;
-                insideRow["Image7"] = az.Value.Image7;
-                insideRow["Image8"] = az.Value.Image8;
-                insideRow["MainImage"] = az.Value.MainImage;
-                insideRow["WholeSale"] = Convert.ToDouble(az.Value.WholeSale);
-                insideRow["Quantity"] = Convert.ToInt32(az.Value.Quantity);
-                insideRow["ShortDescription"] = az.Value.ShortDescription;
-                insideRow["Weight"] = Convert.ToDouble(az.Value.Weight);
-                insideRow["HTMLDescription"] = az.Value.HTMLDescription;
+                Wholesaler_AzImporter azImporter = new Wholesaler_AzImporter();
 
-                uploadAzImporter.Rows.Add(insideRow);
-                uploadAzImporter.AcceptChanges();
+                azImporter.id = bulkSize;
+                azImporter.Sku = az.Value.Sku;
+                azImporter.Category = az.Value.Category;
+                azImporter.ItemName = az.Value.ItemName;
+                azImporter.Image1 = az.Value.Image1;
+                azImporter.Image2 = az.Value.Image2;
+                azImporter.Image3 = az.Value.Image3;
+                azImporter.Image4 = az.Value.Image4;
+                azImporter.Image5 = az.Value.Image5;
+                azImporter.Image6 = az.Value.Image6;
+                azImporter.Image7 = az.Value.Image7;
+                azImporter.Image8 = az.Value.Image8;
+                azImporter.MainImage = az.Value.MainImage;
+                azImporter.WholeSale = Convert.ToDouble(az.Value.WholeSale);
+                azImporter.Quantity = Convert.ToInt32(az.Value.Quantity);
+                azImporter.ShortDescription = az.Value.ShortDescription;
+                azImporter.Weight = az.Value.Weight;
+                azImporter.HTMLDescription = az.Value.HTMLDescription;
+
+                azImport.Add(azImporter);
 
                 bulkSize++;
+                
             }
-
-            upload(uploadAzImporter, bulkSize, "dbo.AzImporter");
         }
     }
 }

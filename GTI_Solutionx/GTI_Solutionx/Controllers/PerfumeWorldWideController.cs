@@ -79,7 +79,7 @@ namespace GTI_Solutionx.Controllers
 
             fragrancex = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
 
-            fragrancexUpc = _context.Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.ItemID, y => y.Upc);
+            fragrancexUpc = _context.Wholesaler_Fragrancex.Where(z => z.Upc != null).ToDictionary(x => x.Sku, y => y.Upc);
 
             PerfumeWorldWideComparer perfumeWorldWideComparer = new PerfumeWorldWideComparer(fragrancex)
             {

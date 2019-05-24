@@ -15,13 +15,13 @@ namespace GTI_Solutionx.Data
 
         public DbSet<Profile> Profile { set; get; }
         public DbSet<ServiceTimeStamp> ServiceTimeStamp { get; set; }
-        public DbSet<Fragrancex> Fragrancex { get; set; }
+        public DbSet<Wholesaler_Fragrancex> Wholesaler_Fragrancex { get; set; }
         public DbSet<UPC> UPC { get; set; }
-        public DbSet<AzImporter> AzImporter { get; set; }
+        public DbSet<Wholesaler_AzImporter> Wholesaler_AzImporter { get; set; }
         public DbSet<PerfumeWorldWide> PerfumeWorldWide { get; set; }
         public DbSet<Shipping> Shipping { get; set; }
         public DbSet<Amazon> Amazon { get; set; }
-        public DbSet<FragrancexTitle> FragrancexTitle { get; set; }
+        public DbSet<FragrancexTitles> FragrancexTitle { get; set; }
         public DbSet<ShopifyUser> ShopifyUser { get; set; }
         public DbSet<UsersList> UsersList { get; set; }
         public DbSet<UsersListTemp> UsersListTemp { get; set; }

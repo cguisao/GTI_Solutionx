@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GTI_Solutionx.Models.Dashboard
 {
-    public class Fragrancex
+    public class Wholesaler_Fragrancex
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int ItemID { get; set; }
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int id { get; set; }
+        public int Sku { get; set; }
         public string BrandName { get; set; }
         public string Description { get; set; }
         public string Gender { get; set; }
@@ -30,9 +30,7 @@ namespace GTI_Solutionx.Models.Dashboard
         public double WholePriceGBP { get; set; }
         public double WholePriceUSD { get; set; }
         public bool isInstock { get; set; }
-
         public long? Upc { get; set; }
-        public UPC upc { get; set; }
         
     }
 }

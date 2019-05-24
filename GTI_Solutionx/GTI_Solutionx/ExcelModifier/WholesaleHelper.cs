@@ -20,9 +20,9 @@ namespace DatabaseModifier
 
         public Dictionary<string, bool> blackListedList { get; set; }
 
-        public Dictionary<int, Fragrancex> fragrancexList { get; set; }
+        public Dictionary<int, Wholesaler_Fragrancex> fragrancexList { get; set; }
 
-        public Dictionary<string, AzImporter> azImporterList { get; set; }
+        public Dictionary<string, Wholesaler_AzImporter> azImporterList { get; set; }
 
         public Dictionary<string, PerfumeWorldWide> perfumeWorldWideList { get; set; }
 
@@ -34,7 +34,7 @@ namespace DatabaseModifier
             {
                 if (azImporterList.ContainsKey(internalSku.ToUpper()))
                 {
-                    AzImporter a = new AzImporter();
+                    Wholesaler_AzImporter a = new Wholesaler_AzImporter();
                     azImporterList.TryGetValue(internalSku.ToUpper(), out a);
                     azImporter = a;
                     return true;
@@ -226,9 +226,9 @@ namespace DatabaseModifier
             throw new NotImplementedException();
         }
 
-        public Fragrancex fragrancex { get; set; }
+        public Wholesaler_Fragrancex fragrancex { get; set; }
 
-        public AzImporter azImporter { get; set; }
+        public Wholesaler_AzImporter azImporter { get; set; }
 
         public PerfumeWorldWide perfumeWorldWide { get; set; }
         

@@ -69,7 +69,7 @@
                             {
                                 <tr>
                                     <td>
-                                        @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                                        @item.TimeStamp.ToString("dd/MM/yyyy HH:mm tt")
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.type)

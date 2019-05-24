@@ -12,7 +12,13 @@ namespace ExcelModifier
 {
     public class AmazonDBUploader : WholesaleHelper, IExcelExtension
     {
-        public AmazonDBUploader(string _path, Dictionary<string, AzImporter> _azImporter, Dictionary<int, Fragrancex> _fragracex
+        private Dictionary<string, Wholesaler_AzImporter> azImporter1;
+        private Dictionary<int, Wholesaler_Fragrancex> fragrancex1;
+        private Dictionary<object, PerfumeWorldWide> perfumeWorldWide1;
+        private Dictionary<string, Amazon> amazon;
+        private Dictionary<int, double> shipping;
+
+        public AmazonDBUploader(string _path, Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<int, Wholesaler_Fragrancex> _fragracex
             , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide, Dictionary<string, Amazon> _amazon
             , Dictionary<int, double> _shipping)
         {
@@ -25,7 +31,17 @@ namespace ExcelModifier
             amazonPrintList = new List<Amazon>();
             setList();
         }
-        
+
+        public AmazonDBUploader(string path, Dictionary<string, Wholesaler_AzImporter> azImporter1, Dictionary<int, Wholesaler_Fragrancex> fragrancex1, Dictionary<object, PerfumeWorldWide> perfumeWorldWide1, Dictionary<string, Amazon> amazon, Dictionary<int, double> shipping)
+        {
+            this.path = path;
+            this.azImporter1 = azImporter1;
+            this.fragrancex1 = fragrancex1;
+            this.perfumeWorldWide1 = perfumeWorldWide1;
+            this.amazon = amazon;
+            this.shipping = shipping;
+        }
+
         //public List<Amazon> amazon = 
 
         public void ExcelGenerator()
@@ -106,6 +122,7 @@ namespace ExcelModifier
                                         {
                                             Amazon amazon = new Amazon();
 
+                                            amazon.id = amazonList.Count + 1;
                                             amazon.Asin = asin;
                                             sellingPrice = getSellingPrice();
                                             amazon.sku = azImporter.Sku.ToUpper();

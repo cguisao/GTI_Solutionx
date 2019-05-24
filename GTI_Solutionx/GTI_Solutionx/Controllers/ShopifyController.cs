@@ -18,6 +18,8 @@ using GTI_Solutionx.Data;
 using GTI_Solutionx.Models.Dashboard;
 using GTI_Solutionx.Code;
 using Microsoft.AspNetCore.Authorization;
+using EFCore.BulkExtensions;
+using FrgxPublicApiSDK.Models;
 
 namespace GTI_Solutionx.Controllers
 {
@@ -38,7 +40,7 @@ namespace GTI_Solutionx.Controllers
         {
             ViewBag.TimeStamp = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault().TimeStamp.ToShortDateString();
+                .LastOrDefault().TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.type = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -62,7 +64,7 @@ namespace GTI_Solutionx.Controllers
         {
             ViewBag.TimeStamp = _context.ServiceTimeStamp
                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-               .LastOrDefault().TimeStamp.ToShortDateString();
+               .LastOrDefault().TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.type = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -93,6 +95,9 @@ namespace GTI_Solutionx.Controllers
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();
+
+            var test = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString());
 
             return View(_context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -291,7 +296,7 @@ namespace GTI_Solutionx.Controllers
             }
             
             var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
-            var fragrancex = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y);
+            var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, y => y);
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y);
             var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
                 .ToDictionary(x => x.sku, y => y.userID);
@@ -411,7 +416,7 @@ namespace GTI_Solutionx.Controllers
 
         [Authorize(Roles = "Admin, user")]
         [HttpPost]
-        public IActionResult UpdateFragrancexExcel(string file)
+        public async Task<IActionResult> UpdateFragrancexExcel(string file)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
@@ -427,21 +432,37 @@ namespace GTI_Solutionx.Controllers
 
             var fragranceTitle = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
 
+            // delete everything from the db, then update
+
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                await _context.BulkDeleteAsync(_context.Wholesaler_Fragrancex.ToList());
+                tran.Commit();
+            }
+
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcel.fragancexList);
+                tran.Commit();
+            }
+
             DBModifierFragrancexExcelList dBModifierFragrancexExcelList = new DBModifierFragrancexExcelList(path, fragranceTitle);
 
-            try
+            // insert to the db and update fragranceTitle
+
+            dBModifierFragrancexExcelList.TableExecutor();
+
+            using (var tran = _context.Database.BeginTransaction())
             {
-                dBModifierFragrancexExcelList.TableExecutor();
-            }catch(Exception e)
-            {
-                return RedirectToAction("Index");
+                await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcelList.fragrance);
+                tran.Commit();
             }
-            
 
             ServiceTimeStamp service = new ServiceTimeStamp();
 
-            service.TimeStamp = DateTime.Today;
-
+            service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            
             service.Wholesalers = Wholesalers.Fragrancex.ToString();
 
             service.type = "Excel";
@@ -484,9 +505,7 @@ namespace GTI_Solutionx.Controllers
         private void FragancexSQLPreparer(ServiceTimeStamp service)
         {
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
-
-            // TODO: Test this functionality once Alex is done with his development!!
-
+            
             try
             {
                 var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
@@ -500,7 +519,7 @@ namespace GTI_Solutionx.Controllers
                 //allProducts.Add(product);
 
                 var allProducts = listingApiClient.GetAllProducts();
-                
+
                 DBModifierFragrancexAPI dBModifierFragrancexAPI = new DBModifierFragrancexAPI("", upc)
                 {
                     allProducts = allProducts
@@ -508,7 +527,22 @@ namespace GTI_Solutionx.Controllers
 
                 dBModifierFragrancexAPI.TableExecutor();
 
-                service.TimeStamp = DateTime.Today;
+                // delete everything from the db, then update
+
+                using (var tran = _context.Database.BeginTransaction())
+                {
+                    _context.BulkDelete(_context.Wholesaler_Fragrancex.ToList());
+                    tran.Commit();
+                }
+
+                using (var tran = _context.Database.BeginTransaction())
+                {
+                    _context.BulkInsertOrUpdate(dBModifierFragrancexAPI.fragrancex);
+                    tran.Commit();
+                }
+
+                service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                    , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
                 service.Wholesalers = Wholesalers.Fragrancex.ToString();
 
@@ -520,7 +554,6 @@ namespace GTI_Solutionx.Controllers
             }
             catch (Exception)
             {
-
             }
         }
     }

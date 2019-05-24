@@ -12,8 +12,8 @@ namespace ExcelModifier
 {
     public class AmazonExcelUpdator : WholesaleHelper, IExcelExtension
     {
-        public AmazonExcelUpdator(string _path, Dictionary<int, Fragrancex> _fragrancex
-            , Dictionary<string, AzImporter> _azImporter, Dictionary<string, bool> _blackListed
+        public AmazonExcelUpdator(string _path, Dictionary<int, Wholesaler_Fragrancex> _fragrancex
+            , Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<string, bool> _blackListed
             , Dictionary<int, double> _shipping, Dictionary<string, PerfumeWorldWide> _perfumeWorldWide)
         {
             this.path = _path;
@@ -108,7 +108,7 @@ namespace ExcelModifier
                                     if(fragrancexList.ContainsKey(digitSku))
                                     {
                                         skuID = DigitGetter(rowSku);
-                                        Fragrancex f = new Fragrancex();
+                                        Wholesaler_Fragrancex f = new Wholesaler_Fragrancex();
                                         fragrancexList.TryGetValue(Convert.ToInt32(skuID), out f);
                                         fragrancex = f;
                                         double sellingPrice = getSellingPrice(fragrancex.WholePriceUSD);

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DatabaseModifier;
+using EFCore.BulkExtensions;
 using GTI_Solutionx.Data;
 using GTI_Solutionx.Models.Dashboard;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,7 @@ namespace GTI_Solutions.Controllers
         {
             ViewBag.TimeStamp = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.type = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
@@ -54,13 +55,13 @@ namespace GTI_Solutions.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateAzImportsExcel(string file)
+        public async Task<IActionResult> UpdateAzImportsExcel(string file)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            var azImportItems = _context.AzImporter.ToDictionary(x => x.Sku, y => y);
+            var azImportItems = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, y => y);
 
             foreach(var az in azImportItems)
             {
@@ -71,9 +72,24 @@ namespace GTI_Solutions.Controllers
 
             AzImporter.TableExecutor();
 
+            // delete everything from the db, then update
+
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                await _context.BulkDeleteAsync(_context.Wholesaler_AzImporter.ToList());
+                tran.Commit();
+            }
+
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                await _context.BulkInsertOrUpdateAsync(AzImporter.azImport);
+                tran.Commit();
+            }
+
             ServiceTimeStamp service = new ServiceTimeStamp();
 
-            service.TimeStamp = DateTime.Today;
+            service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                    , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
             service.Wholesalers = Wholesalers.AzImporter.ToString();
 
@@ -116,7 +132,7 @@ namespace GTI_Solutions.Controllers
 
                 var lines = System.IO.File.ReadAllLines(path, Encoding.UTF8).Select(a => a.Split(','));
 
-                List<AzImporter> items = new List<AzImporter>();
+                List<Wholesaler_AzImporter> items = new List<Wholesaler_AzImporter>();
                 int skipFirst = 1;
 
                 foreach (var line in lines)
@@ -124,7 +140,7 @@ namespace GTI_Solutions.Controllers
                     if (line.Length == 17)
                     {
                         int curr = 1;
-                        AzImporter azImporter = new AzImporter();
+                        Wholesaler_AzImporter azImporter = new Wholesaler_AzImporter();
                         foreach (var col in line)
                         {
                             // skip the first line because it is the title of the csv file
@@ -190,7 +206,7 @@ namespace GTI_Solutions.Controllers
                 using (var workbook = new XLWorkbook())
                 {
                     //rowCount = 1;
-                    AzImporter azImporter = new AzImporter();
+                    Wholesaler_AzImporter azImporter = new Wholesaler_AzImporter();
                     //foreach (var line in csv.GetRecords<AzImporter>())
                     //{
 

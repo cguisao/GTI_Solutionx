@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GTI_Solutionx.Models.Dashboard
 {
-    public class FragrancexTitle
+    public class FragrancexTitles
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

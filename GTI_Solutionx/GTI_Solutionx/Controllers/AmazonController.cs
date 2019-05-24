@@ -28,7 +28,7 @@ namespace GTI_Solutionx.Controllers
         {
             ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -36,7 +36,7 @@ namespace GTI_Solutionx.Controllers
 
             ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.typeAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
@@ -70,7 +70,7 @@ namespace GTI_Solutionx.Controllers
         {
             ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -78,7 +78,7 @@ namespace GTI_Solutionx.Controllers
 
             ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.typeAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
@@ -86,7 +86,7 @@ namespace GTI_Solutionx.Controllers
 
             ViewBag.TimeStampPerfumeWorldWide = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
-                .LastOrDefault()?.TimeStamp.ToShortDateString();
+                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
 
             ViewBag.typePerfumeWorldWide = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())
@@ -108,11 +108,11 @@ namespace GTI_Solutionx.Controllers
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
+            var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
             var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
-            var fragrancex = _context.Fragrancex.ToDictionary(x => x.ItemID, x => x);
+            var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
             var amazon = _context.Amazon.ToDictionary(x => x.Asin, x => x);
 
@@ -164,9 +164,9 @@ namespace GTI_Solutionx.Controllers
 
             var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
 
-            var fragancex = _context.Fragrancex.ToDictionary(x => x.ItemID, x => x);
+            var fragancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
-            var azImporter = _context.AzImporter.ToDictionary(x => x.Sku, x => x);
+            var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
             var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
@@ -220,15 +220,15 @@ namespace GTI_Solutionx.Controllers
 
         private void SetDictionariesAsync()
         {
-            var azImporter = _context.AzImporter.ToHashSet();
+            var azImporter = _context.Wholesaler_AzImporter.ToHashSet();
 
-            var fragrancex = _context.Fragrancex.ToHashSet();
+            var fragrancex = _context.Wholesaler_Fragrancex.ToHashSet();
 
             shippingWeight = _context.Shipping.ToDictionary(x => x.weightId, y => y.ItemPrice);
             
             var tasks = new List<Task>();
 
-            Task fragrancexPricesTask = new Task(() => fragrancexPrices = fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD));
+            Task fragrancexPricesTask = new Task(() => fragrancexPrices = fragrancex.ToDictionary(x => x.Sku, y => y.WholePriceUSD));
 
             Task azImportPriceTask = new Task(() => azImportPrice = azImporter.ToDictionary(x => x.Sku, y => y.WholeSale));
 

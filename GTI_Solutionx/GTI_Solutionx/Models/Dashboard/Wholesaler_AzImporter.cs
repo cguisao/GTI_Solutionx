@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace GTI_Solutionx.Models.Dashboard
 {
-    public class AzImporter
+    public class Wholesaler_AzImporter
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int ItemID { get; set; }
+        public int id { get; set; }
 
         public string Sku { get; set; }
 

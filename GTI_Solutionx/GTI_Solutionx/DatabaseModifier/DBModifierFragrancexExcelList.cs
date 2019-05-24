@@ -1,4 +1,5 @@
-﻿using OfficeOpenXml;
+﻿using GTI_Solutionx.Models.Dashboard;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,6 +18,8 @@ namespace DatabaseModifier
         }
 
         private Dictionary<int, string> fragranceTitle { get; set; }
+
+        public List<FragrancexTitles> fragrance = new List<FragrancexTitles>();
 
         private string path { get; set; }
 
@@ -50,10 +53,7 @@ namespace DatabaseModifier
                     for (int row = 2; row <= rowCount; row++)
                     {
                         exception++;
-                        if(exception == 7162)
-                        {
 
-                        }
                         int sku = Convert.ToInt32(worksheet.Cells[row, 13].Value?.ToString());
                         string size = string.Empty;
                         string title = string.Empty;
@@ -67,30 +67,40 @@ namespace DatabaseModifier
                             title = fixTitle(worksheet.Cells[row, 2].Value?.ToString())
                             + " " + size + "oz";
                         }
-                        
+
+                        fragranceTitle.TryGetValue(sku, out string value);
+
+                        if(string.IsNullOrEmpty(value))
+                        {
+                            FragrancexTitles fran = new FragrancexTitles();
+                            fran.ItemID = sku;
+                            fran.Title = title;
+                            fragrance.Add(fran);
+                        }
+
                         fragranceTitle.TryAdd(sku, title);
                     }
                 }
 
-                foreach(var item in fragranceTitle)
-                {
-                    DataRow insideRow = uploadFragrancexTitle.NewRow();
+                //foreach(var item in fragranceTitle)
+                //{
+                //    DataRow insideRow = uploadFragrancexTitle.NewRow();
 
-                    insideRow["ItemID"] = item.Key;
-                    insideRow["Title"] = item.Value;
+                //    insideRow["ItemID"] = item.Key;
+                //    insideRow["Title"] = item.Value;
 
-                    uploadFragrancexTitle.Rows.Add(insideRow);
-                    uploadFragrancexTitle.AcceptChanges();
+                //    uploadFragrancexTitle.Rows.Add(insideRow);
+                //    uploadFragrancexTitle.AcceptChanges();
 
-                    bulkSize++;
-                }
+                //    bulkSize++;
+                //}
             }
             catch (Exception ex)
             {
                 throw (ex);
             }
 
-            upload(uploadFragrancexTitle, bulkSize, "dbo.FragrancexTitle");
+            //upload(uploadFragrancexTitle, bulkSize, "dbo.FragrancexTitle");
         }
 
         private string getSize(string v)

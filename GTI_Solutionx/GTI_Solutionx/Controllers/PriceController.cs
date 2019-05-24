@@ -71,7 +71,7 @@ namespace GTI_Solutionx.Controllers
 
             //var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
-            var prices = _context.Fragrancex.ToDictionary(x => x.ItemID, y => y.WholePriceUSD);
+            var prices = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, y => y.WholePriceUSD);
 
             Profile profile = new Profile();
 

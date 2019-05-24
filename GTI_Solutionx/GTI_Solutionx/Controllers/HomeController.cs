@@ -36,13 +36,13 @@ namespace GTI_Solutionx.Controllers
                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
                .LastOrDefault()?.TimeStamp.ToShortDateString();
 
-            ViewBag.FragrancexItems = _context.Fragrancex.Count();
+            ViewBag.FragrancexItems = _context.Wholesaler_Fragrancex.Count();
 
             ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.TimeStamp.ToShortDateString();
 
-            ViewBag.AzImportItems = _context.AzImporter.Count();
+            ViewBag.AzImportItems = _context.Wholesaler_AzImporter.Count();
 
             ViewBag.TimeStamPerfumeWorldWide = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.PerfumeWorldWide.ToString())

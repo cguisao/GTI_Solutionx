@@ -15,7 +15,7 @@ namespace ExcelModifier
     public class ShopifyExcelCreator : DBRawQueries, IExcelExtension, IDatabaseModifier
     {
         public ShopifyExcelCreator(Profile _profile, Dictionary<string, ShopifyUser> _shopifyProfile
-            , Dictionary<int, Fragrancex> _fragrancex, ConcurrentDictionary<string, string> _shopifyUser
+            , Dictionary<int, Wholesaler_Fragrancex> _fragrancex, ConcurrentDictionary<string, string> _shopifyUser
             , Dictionary<int, UPC> _upc, string _path)
         {
             profile = _profile;
@@ -44,7 +44,7 @@ namespace ExcelModifier
 
         public ConcurrentDictionary<string, string> shopifyUser { get; set; }
 
-        private Dictionary<int, Fragrancex> fragrancex { get; set; }
+        private Dictionary<int, Wholesaler_Fragrancex> fragrancex { get; set; }
 
         private Dictionary<int, UPC> upc { get; set; }
 
@@ -118,7 +118,7 @@ namespace ExcelModifier
 
                                 itemID = item.Value.sku;
 
-                                Fragrancex fra = new Fragrancex();
+                                Wholesaler_Fragrancex fra = new Wholesaler_Fragrancex();
 
                                 fragrancex.TryGetValue(Convert.ToInt32(itemID), out fra);
 
