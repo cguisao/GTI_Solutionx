@@ -20,7 +20,6 @@ namespace GTI_Solutionx
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseKestrel(o => { o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(100); })
                 .Build();
     }
 }
