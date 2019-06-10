@@ -32,8 +32,7 @@ namespace DatabaseModifier
             {
                 try
                 {
-                    dic.Add(product.ItemId, product.ProductName);
-                    if (product != null)
+                    if (product != null && dic.ContainsValue(product.ItemId))
                     {
                         Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
 
@@ -65,7 +64,7 @@ namespace DatabaseModifier
                         fragrancex.Add(fran);
                     }
                 }
-                catch
+                catch(Exception e)
                 {
                     throw;
                 }
