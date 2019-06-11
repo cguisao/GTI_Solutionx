@@ -19,8 +19,8 @@ namespace ExcelModifier
         private Dictionary<int, double> shipping;
 
         public AmazonDBUploader(string _path, Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<int, Wholesaler_Fragrancex> _fragracex
-            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide, Dictionary<string, Amazon> _amazon
-            , Dictionary<int, double> _shipping)
+            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide, List<Amazon> _amazon
+            , Dictionary<int, double> _shipping, MarketPlace _marketPlace)
         {
             path = _path;
             fragrancexList = _fragracex;
@@ -29,6 +29,7 @@ namespace ExcelModifier
             amazonList = _amazon;
             ShippingList = _shipping;
             amazonPrintList = new List<Amazon>();
+            marketPlace = _marketPlace;
             setList();
         }
 
@@ -90,7 +91,7 @@ namespace ExcelModifier
                                 //double rowPrice = Convert.ToDouble(worksheet.Cells[row, price].Value);
                                 string asin = worksheet.Cells[row, 2].Value.ToString();
 
-                                if (amazonList.ContainsKey(asin))
+                                if (isInDB(asin))
                                 {
                                     amazonPrintList.RemoveAll(x => x.Asin == asin);
                                 }
@@ -106,12 +107,13 @@ namespace ExcelModifier
                                             amazon.id = amazonList.Count + 1;
                                             amazon.Asin = asin;
                                             skuID = DigitGetter(rowSku);
-                                            if(skuID == 0)
+                                            //if(skuID == 0)
                                             amazon.sku = skuID.ToString();
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.Fragrancex.ToString();
                                             amazon.blackList = false;
-                                            amazonList.Add(asin, amazon);
+                                            amazon.marketPlace = marketPlace.ToString();
+                                            amazonList.Add(amazon);
 
                                             amazonPrintList.Add(amazon);
                                         }
@@ -129,7 +131,8 @@ namespace ExcelModifier
                                             amazon.price = Convert.ToDouble(worksheet.Cells[row, 3].Value);
                                             amazon.wholesaler = Wholesalers.AzImporter.ToString();
                                             amazon.blackList = false;
-                                            amazonList.Add(asin, amazon);
+                                            amazon.marketPlace = marketPlace.ToString();
+                                            amazonList.Add(amazon);
 
                                             amazonPrintList.Add(amazon);
                                         }
@@ -139,10 +142,12 @@ namespace ExcelModifier
                         }
                     }
 
+                    worksheet.DeleteRow(2, rowCount);
+
                     row = 2;
 
-                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString() 
-                        && x.blackList == false))
+                    foreach (Amazon list in amazonPrintList.Where(x => x.blackList == false 
+                        && x.marketPlace == marketPlace.ToString()).OrderBy(x => x.wholesaler))
                     {
                         Random rnd = new Random();
                         Random rnd2 = new Random();
@@ -161,32 +166,6 @@ namespace ExcelModifier
                         row++;
                     }
 
-                    //row = 2;
-
-                    foreach (Amazon list in amazonPrintList.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()
-                        && x.blackList == false))
-                    {
-                        Random rnd = new Random();
-                        Random rnd2 = new Random();
-                        double rand3 = Convert.ToDouble(rnd2.Next(1, 99)) / 100;
-                        worksheet.Cells[row, 1].Value = list.sku + " " + rnd.Next(1, 49999);
-                        worksheet.Cells[row, 2].Value = list.Asin;
-                        worksheet.Cells[row, 3].Value = 1;
-                        worksheet.Cells[row, 4].Value = list.price + rand3;
-                        worksheet.Cells[row, 5].Value = "delete";
-                        worksheet.Cells[row, 6].Value = "delete";
-                        worksheet.Cells[row, 7].Value = 11;
-                        worksheet.Cells[row, 8].Value = 0;
-                        worksheet.Cells[row, 9].Value = "a";
-                        worksheet.Cells[row, 10].Value = "n";
-                        worksheet.Cells[row, 14].Value = "unknown_binding";
-                        row++;
-                    }
-
-                    // Delete unused rows 
-
-                    worksheet.DeleteRow(amazonPrintList.Count + 2, rowCount);
-                    
                     package.Save();
                 }
             }
@@ -198,7 +177,7 @@ namespace ExcelModifier
 
         private bool isInDB(string asin)
         {
-            if(amazonList.ContainsKey(asin))
+            if(amazonList.Any(x => x.Asin == asin && x.marketPlace == marketPlace.ToString()))
             {
                 return true;
             }
@@ -212,7 +191,7 @@ namespace ExcelModifier
         {
             foreach(var item in amazonList)
             {
-                amazonPrintList.Add(item.Value);
+                amazonPrintList.Add(item);
             }
         }
 
@@ -247,7 +226,9 @@ namespace ExcelModifier
 
         public Dictionary<int, double> fragrancexPrices { get; set; }
 
-        public Dictionary<string, Amazon> amazonList { get; set; }
+        public List<Amazon> amazonList { get; set; }
+
+        public MarketPlace marketPlace { get; set; }
 
         public List<Amazon> amazonPrintList { get; set; }
         

@@ -22,6 +22,8 @@ namespace GTI_Solutionx.Models.Dashboard
         public string wholesaler { get; set; }
 
         public bool blackList { get; set; }
+
+        public string marketPlace { get; set; }
         
     }
 }

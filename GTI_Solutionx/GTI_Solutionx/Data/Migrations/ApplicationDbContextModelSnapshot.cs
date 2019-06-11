@@ -78,6 +78,8 @@ namespace GTI_Solutionx.Data.Migrations
 
                     b.Property<bool>("blackList");
 
+                    b.Property<string>("marketPlace");
+
                     b.Property<double>("price");
 
                     b.Property<string>("sku");

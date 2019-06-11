@@ -102,24 +102,24 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonDB(string file)
+        public async Task<IActionResult> UpdateAmazonDB(string file, MarketPlace marketPlace)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-
+            
             var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
             var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
             var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
-            var amazon = _context.Amazon.ToDictionary(x => x.Asin, x => x);
+            var amazon = _context.Amazon.ToList();
 
             var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
             AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
-                , perfumeWorldWide, amazon, shipping);
+                , perfumeWorldWide, amazon, shipping, marketPlace);
             
             try
             {
@@ -132,7 +132,7 @@ namespace GTI_Solutionx.Controllers
 
             using (var tran = _context.Database.BeginTransaction())
             {
-                await _context.BulkInsertOrUpdateAsync(amazonDBUploader.amazonPrintList);
+                await _context.BulkInsertOrUpdateAsync(amazonDBUploader.amazonList);
                 tran.Commit();
             }
 
@@ -156,12 +156,12 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonList(string file)
+        public async Task<IActionResult> UpdateAmazonList(string file, MarketPlace marketPlace)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-
+            
             var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
 
             var fragancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
@@ -173,7 +173,7 @@ namespace GTI_Solutionx.Controllers
             var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
             AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter
-                , blackListed, shipping, perfumeWorldWide);
+                , blackListed, shipping, perfumeWorldWide, marketPlace);
 
             amazonExcelUpdator.ExcelGenerator();
             

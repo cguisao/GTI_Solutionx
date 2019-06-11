@@ -14,7 +14,8 @@ namespace ExcelModifier
     {
         public AmazonExcelUpdator(string _path, Dictionary<int, Wholesaler_Fragrancex> _fragrancex
             , Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<string, bool> _blackListed
-            , Dictionary<int, double> _shipping, Dictionary<string, PerfumeWorldWide> _perfumeWorldWide)
+            , Dictionary<int, double> _shipping, Dictionary<string, PerfumeWorldWide> _perfumeWorldWide
+            , MarketPlace _marketPlace)
         {
             this.path = _path;
             fragrancexList = _fragrancex;
@@ -22,9 +23,12 @@ namespace ExcelModifier
             blackListedList = _blackListed;
             ShippingList = _shipping;
             perfumeWorldWideList = _perfumeWorldWide;
+            marketPlace = _marketPlace;
         }
         public string path { get; set; }
         
+        public MarketPlace marketPlace { get; set; }
+
         public Dictionary<int, double> fragrancexPrices { get; set; }
         
         public void ExcelGenerator()
