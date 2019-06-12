@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,6 +24,7 @@ namespace GTI_Solutionx.Models.Dashboard
 
         public bool blackList { get; set; }
 
+        [Remote(action: "BlackList", controller: "Amazon")]
         public string marketPlace { get; set; }
         
     }

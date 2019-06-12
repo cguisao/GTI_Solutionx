@@ -18,7 +18,7 @@ namespace GTI_Solutionx.Controllers
     public class AmazonController : Controller
     {
         public ApplicationDbContext _context;
-
+        
         public AmazonController(ApplicationDbContext context)
         {
             _context = context;
@@ -206,26 +206,36 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public IActionResult BlackList(string Asin, string modifer)
+        public IActionResult BlackList(string Asin, string modifer, MarketPlace marketPlace)
         {
             Amazon currAsin = new Amazon();
 
-            var amazon = _context.Amazon.Where(x => x.Asin == Asin);
+            var amazon = _context.Amazon.Where(x => x.Asin == Asin && x.marketPlace == marketPlace.ToString());
 
             currAsin.id = Convert.ToInt32(amazon.Select(x => x.id).FirstOrDefault());
             currAsin.Asin = Convert.ToString(amazon.Select(x => x.Asin).FirstOrDefault());
             currAsin.sku = Convert.ToString(amazon.Select(x => x.sku).FirstOrDefault());
             currAsin.wholesaler = Convert.ToString(amazon.Select(x => x.wholesaler).FirstOrDefault());
             currAsin.price = Convert.ToDouble(amazon.Select(x => x.price).FirstOrDefault());
+            currAsin.marketPlace = marketPlace.ToString();
 
-            if (currAsin != null)
+            try
             {
-                currAsin.blackList = Convert.ToBoolean(modifer);
-                _context.Amazon.Update(currAsin);
-                _context.SaveChanges();
+                if (currAsin != null)
+                {
+                    currAsin.blackList = Convert.ToBoolean(modifer);
+                    _context.Amazon.Update(currAsin);
+                    _context.SaveChanges();
+                }
             }
-            
-            return Redirect("BlackList");
+            catch
+            {
+                ViewData["Error"] = "The ASIN and/or Market Place is NOT in the database.";
+                return View(_context.Amazon.ToList().Where(x => x.blackList == true));
+            }
+
+            ViewData["Success"] = "ASIN added to the database successfully.";
+            return View(_context.Amazon.ToList().Where(x => x.blackList == true));
         }
 
         private void SetDictionariesAsync()
