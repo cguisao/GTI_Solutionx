@@ -32,7 +32,7 @@ namespace DatabaseModifier
             {
                 try
                 {
-                    if (product != null && dic.ContainsValue(product.ItemId))
+                    if (product != null && !dic.ContainsKey(product.ItemId))
                     {
                         Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
 
@@ -60,6 +60,8 @@ namespace DatabaseModifier
                         {
                             fran.Upc = value;
                         }
+
+                        dic.Add(fran.Sku.ToString(), fran.Sku.ToString());
 
                         fragrancex.Add(fran);
                     }
