@@ -114,8 +114,6 @@ namespace ExcelModifier
                                             amazon.blackList = false;
                                             amazon.marketPlace = marketPlace.ToString();
                                             amazonList.Add(amazon);
-
-                                            amazonPrintList.Add(amazon);
                                         }
                                     }
                                     else if (isAzImporter(rowSku))
@@ -133,8 +131,7 @@ namespace ExcelModifier
                                             amazon.blackList = false;
                                             amazon.marketPlace = marketPlace.ToString();
                                             amazonList.Add(amazon);
-
-                                            amazonPrintList.Add(amazon);
+                                            
                                         }
                                     }
                                 }
