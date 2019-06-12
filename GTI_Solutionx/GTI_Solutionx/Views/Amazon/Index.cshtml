@@ -18,6 +18,7 @@
                             be able to take an excel from an Amazon report and return
                             the items that are available in a spreadsheet.
                         </p>
+
                         <div id="dropzone">
                             <form asp-controller="Home" asp-action="DropzoneFileUpload" asp-antiforgery="false"
                                   class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
@@ -30,20 +31,26 @@
                                 </div>
                             </form>
                         </div>
+                    </div>
+                    <div class="card-body">
                         <form asp-controller="Amazon" asp-action="UpdateAmazonList" asp-antiforgery="false"
-                              enctype="multipart/form-data">
-                            <div class="text-center m-t-15 invisible">
-                                <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
-                            </div>
-                            <div class="text-center m-t-15">
-                                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                              enctype="multipart/form-data" name="myForm">
+                            <div class="form-row">
+                                <div class="form-group text-center col-md-12">
+                                </div>
+                                <div class="text-center m-t-15 invisible">
+                                    <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                                </div>
+                                <div class="form-group text-center col-md-12">
+                                    <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                                </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <p>
+        <p id="select">
             Last <b>Fragrancex</b> database update <b>@ViewBag.TimeStampFragrancex Updated via  @ViewBag.typeAzFragrancex</b> <br />
         </p>
 
@@ -58,3 +65,15 @@
     </div>
 </div>
 
+<script>
+    var imageList = Array();
+    for (var i = 0; i <= 7; i++) {
+        imageList[i] = new Image(70, 70);
+        imageList[i].src = "/assets/images/flag" + i + ".jpg";
+    }
+
+    function switchImage() {
+        var selectedImage = document.myForm.marketPlace.options[document.myForm.marketPlace.selectedIndex].value;
+        document.myImage.src = imageList[selectedImage].src;
+    }
+</script>

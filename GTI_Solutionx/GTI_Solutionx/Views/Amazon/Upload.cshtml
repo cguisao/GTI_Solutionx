@@ -12,7 +12,7 @@
             <div class="col-md-12">
                 <div class="card m-b-30">
                     <div class="card-body">
-                        <h2>Amazon Uploader</h2>
+                        <h2>New ASIN</h2>
                         <p>
                             This application is intended to create an excel which will
                             be able to take an excel from an Amazon report and return
@@ -60,27 +60,6 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xl-12">
-                <div class="card ">
-                    <div class="card-body">
-                        <h2>Amazon Black List</h2>
-                        <form asp-controller="Amazon" asp-action="BlackList" asp-antiforgery="false"
-                              enctype="multipart/form-data">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="ProfileUser">Asin:</label>
-                                    <input type="text" class="form-control" name="Asin" placeholder="Asin" required>
-                                </div>
-                                <div class="text-center m-t-15">
-                                    <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
         <p>
             Last <b>Fragrancex</b> database update <b>@ViewBag.TimeStampFragrancex Updated via  @ViewBag.typeAzFragrancex</b> <br />
         </p>
@@ -89,7 +68,16 @@
             Last <b>AzImporter</b> database update <b>@ViewBag.TimeStampAzImport Updated via  @ViewBag.typeAzImport</b> <br />
         </p>
         <p>
-            ASINs uploaded in the database <b>@ViewBag.amazonItems</b> <br />
+            United States' ASINs uploaded in the database <b>@ViewBag.amazonUS</b> <br />
+        </p>
+        <p>
+            United Kingdom ASINs uploaded in the database <b>@ViewBag.amazonUK</b> <br />
+        </p>
+        <p>
+            Japan's ASINs uploaded in the database <b>@ViewBag.amazonJP</b> <br />
+        </p>
+        <p>
+            Australia's ASINs uploaded in the database <b>@ViewBag.amazonAU</b> <br />
         </p>
         <p>
             Total Fragrancex ASINs uploaded in the database <b>@ViewBag.amazonFragrancex</b> <br />

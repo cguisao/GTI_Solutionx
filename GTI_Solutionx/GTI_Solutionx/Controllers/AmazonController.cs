@@ -42,7 +42,17 @@ namespace GTI_Solutionx.Controllers
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                 .LastOrDefault()?.type;
 
-            ViewBag.amazonItems = _context.Amazon.Where(x => x.blackList != true).Count();
+            ViewBag.amazonUS = _context.Amazon.Where(x => x.blackList != true 
+                                        && x.marketPlace == MarketPlace.US.ToString()).Count();
+
+            ViewBag.amazonUK = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.UK.ToString()).Count();
+
+            ViewBag.amazonJP = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.JP.ToString()).Count();
+
+            ViewBag.amazonAU = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.AU.ToString()).Count();
 
             ViewBag.amazonFragrancex = _context.Amazon.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()
                                          && x.blackList != true).Count();
