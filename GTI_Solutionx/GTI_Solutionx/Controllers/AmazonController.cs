@@ -120,7 +120,7 @@ namespace GTI_Solutionx.Controllers
             
             var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
-            var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
+            //var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
             var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
@@ -129,7 +129,7 @@ namespace GTI_Solutionx.Controllers
             var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
             AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
-                , perfumeWorldWide, amazon, shipping, marketPlace);
+                , amazon, shipping, marketPlace);
             
             try
             {

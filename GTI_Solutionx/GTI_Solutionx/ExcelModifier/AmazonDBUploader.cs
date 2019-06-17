@@ -19,13 +19,12 @@ namespace ExcelModifier
         private Dictionary<int, double> shipping;
 
         public AmazonDBUploader(string _path, Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<int, Wholesaler_Fragrancex> _fragracex
-            , Dictionary<string, PerfumeWorldWide> _perfumeWorldWide, List<Amazon> _amazon
-            , Dictionary<int, double> _shipping, MarketPlace _marketPlace)
+            , List<Amazon> _amazon, Dictionary<int, double> _shipping, MarketPlace _marketPlace)
         {
             path = _path;
             fragrancexList = _fragracex;
             azImporterList = _azImporter;
-            perfumeWorldWideList = _perfumeWorldWide;
+            //perfumeWorldWideList = _perfumeWorldWide;
             amazonList = _amazon;
             ShippingList = _shipping;
             amazonPrintList = new List<Amazon>();

@@ -216,51 +216,51 @@ namespace ExcelModifier
                                     AzImporterPriceWeight = 0.0;
                                     AzImporterWeight = 0.0;
                                 }
-                                else if(isPerfumeWorldWide(rowSku))
-                                {
-                                    // In-stock
-                                    if (perfumeWorldWideList.ContainsKey(rowSku))
-                                    {
-                                        PerfumeWorldWide p = new PerfumeWorldWide();
-                                        perfumeWorldWideList.TryGetValue(rowSku, out p);
-                                        perfumeWorldWide = p;
-                                        double sellingPrice = getSellingPrice(perfumeWorldWide.Cost);
-                                        // Price lower
-                                        if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
-                                        {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = worksheet.Cells[row, quantity].Value;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
-                                            worksheet.Cells[row, 8].Value = sellingPrice;
-                                        }
-                                        // The price is too high 
-                                        else if (isPriceTooHigh(rowPrice, sellingPrice) && sellingPrice != 0)
-                                        {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = 3;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
-                                            worksheet.Cells[row, 8].Value = sellingPrice;
-                                        }
-                                        else if (sellingPrice != 0)
-                                        {
-                                            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                            worksheet.Cells[row, 5].Value = 3;
-                                            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
-                                            worksheet.Cells[row, 8].Value = sellingPrice;
-                                        }
-                                    }
-                                    // Out-stock
-                                    else
-                                    {
-                                        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
-                                        worksheet.Cells[row, 5].Value = 0;
-                                        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
-                                    }
-                                }
+                                //else if(isPerfumeWorldWide(rowSku))
+                                //{
+                                //    // In-stock
+                                //    if (perfumeWorldWideList.ContainsKey(rowSku))
+                                //    {
+                                //        PerfumeWorldWide p = new PerfumeWorldWide();
+                                //        perfumeWorldWideList.TryGetValue(rowSku, out p);
+                                //        perfumeWorldWide = p;
+                                //        double sellingPrice = getSellingPrice(perfumeWorldWide.Cost);
+                                //        // Price lower
+                                //        if (isPriceLower(rowPrice, sellingPrice) && sellingPrice != 0)
+                                //        {
+                                //            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                //            worksheet.Cells[row, 5].Value = worksheet.Cells[row, quantity].Value;
+                                //            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                //            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                                //            worksheet.Cells[row, 8].Value = sellingPrice;
+                                //        }
+                                //        // The price is too high 
+                                //        else if (isPriceTooHigh(rowPrice, sellingPrice) && sellingPrice != 0)
+                                //        {
+                                //            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                //            worksheet.Cells[row, 5].Value = 3;
+                                //            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                //            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.MediumBlue);
+                                //            worksheet.Cells[row, 8].Value = sellingPrice;
+                                //        }
+                                //        else if (sellingPrice != 0)
+                                //        {
+                                //            worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                //            worksheet.Cells[row, 5].Value = 3;
+                                //            worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                //            worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                                //            worksheet.Cells[row, 8].Value = sellingPrice;
+                                //        }
+                                //    }
+                                //    // Out-stock
+                                //    else
+                                //    {
+                                //        worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;
+                                //        worksheet.Cells[row, 5].Value = 0;
+                                //        worksheet.Cells[row, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                //        worksheet.Cells[row, 5].Style.Fill.BackgroundColor.SetColor(Color.Yellow);
+                                //    }
+                                //}
                                 else
                                 {
                                     worksheet.Cells[row, 2].Value = worksheet.Cells[row, price].Value;

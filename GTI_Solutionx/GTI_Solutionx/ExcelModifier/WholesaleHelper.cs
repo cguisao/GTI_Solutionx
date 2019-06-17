@@ -48,79 +48,79 @@ namespace DatabaseModifier
             return false;
         }
 
-        public bool isPerfumeWorldWide(string sku)
-        {
-            // Take care when it is in the dictionary, because it is faster
+        //public bool isPerfumeWorldWide(string sku)
+        //{
+        //    // Take care when it is in the dictionary, because it is faster
 
-            string internalSku = sku;
+        //    string internalSku = sku;
 
-            for (int i = 1; i < sku.Length; i++)
-            {
-                if (perfumeWorldWideList.ContainsKey(internalSku))
-                {
-                    return true;
-                }
-                else
-                {
-                    internalSku = sku.Substring(0, sku.Length - i);
-                }
-            }
+        //    for (int i = 1; i < sku.Length; i++)
+        //    {
+        //        if (perfumeWorldWideList.ContainsKey(internalSku))
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            internalSku = sku.Substring(0, sku.Length - i);
+        //        }
+        //    }
 
-            if (perfumeWorldWideList.ContainsKey(sku))
-            {
-                return true;
-            }
+        //    if (perfumeWorldWideList.ContainsKey(sku))
+        //    {
+        //        return true;
+        //    }
 
-            // Take care of sku where the first character is a letter and the second is a '-'
+        //    // Take care of sku where the first character is a letter and the second is a '-'
 
-            Match hasLetterAndDash = Regex.Match(sku, @"^[a-zA-Z][-]");
+        //    Match hasLetterAndDash = Regex.Match(sku, @"^[a-zA-Z][-]");
             
-            if(hasLetterAndDash.Success)
-            {
-                return true;
-            }
+        //    if(hasLetterAndDash.Success)
+        //    {
+        //        return true;
+        //    }
 
-            // Take care of sku where 3 first chars are letters follow by a number
+        //    // Take care of sku where 3 first chars are letters follow by a number
 
-            Match has3LettersAndNumber = Regex.Match(sku, @"^[a-zA-Z]{3}\d{1}");
+        //    Match has3LettersAndNumber = Regex.Match(sku, @"^[a-zA-Z]{3}\d{1}");
 
-            if(has3LettersAndNumber.Success)
-            {
-                return true;
-            }
+        //    if(has3LettersAndNumber.Success)
+        //    {
+        //        return true;
+        //    }
 
-            // Take care of sku where the first 2 chars are letters follow by a -
+        //    // Take care of sku where the first 2 chars are letters follow by a -
 
-            Match has3Letters = Regex.Match(sku, @"^[a-zA-Z]{2}[-]");
+        //    Match has3Letters = Regex.Match(sku, @"^[a-zA-Z]{2}[-]");
 
-            if (has3Letters.Success)
-            {
-                return true;
-            }
+        //    if (has3Letters.Success)
+        //    {
+        //        return true;
+        //    }
 
-            // Take care of sku where the first 3 chars are letters follow by a dash
+        //    // Take care of sku where the first 3 chars are letters follow by a dash
 
-            Match has3LettersAndDash = Regex.Match(sku, @"^[a-zA-Z]{3}[-]");
+        //    Match has3LettersAndDash = Regex.Match(sku, @"^[a-zA-Z]{3}[-]");
             
-            if(has3LettersAndDash.Success)
-            {
-                return true;
-            }
+        //    if(has3LettersAndDash.Success)
+        //    {
+        //        return true;
+        //    }
 
-            // Take care of sku where they begin with numbers 5-6 digits long
+        //    // Take care of sku where they begin with numbers 5-6 digits long
 
-            int j = 0;
+        //    int j = 0;
             
-            if (Int32.TryParse(sku, out j))
-            {
-                if(j.ToString().Length == 6 || j.ToString().Length == 5)
-                {
-                    return true;
-                }
-            }
+        //    if (Int32.TryParse(sku, out j))
+        //    {
+        //        if(j.ToString().Length == 6 || j.ToString().Length == 5)
+        //        {
+        //            return true;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
         public bool isFragrancex(long? innerItem)
         {
@@ -131,7 +131,7 @@ namespace DatabaseModifier
                 return false;
             }
 
-            if (innerItem.ToString().Length != 6 || perfumeWorldWideList.ContainsKey(innerItem.ToString()))
+            if (innerItem.ToString().Length != 6 /*|| perfumeWorldWideList.ContainsKey(innerItem.ToString())*/)
             {
                 return false;
             }
