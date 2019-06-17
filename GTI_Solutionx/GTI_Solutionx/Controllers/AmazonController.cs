@@ -28,7 +28,7 @@ namespace GTI_Solutionx.Controllers
         {
             ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
+                .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
 
             ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
@@ -36,7 +36,7 @@ namespace GTI_Solutionx.Controllers
 
             ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
+                .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
 
             ViewBag.typeAzImport = _context.ServiceTimeStamp
                 .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
@@ -65,10 +65,8 @@ namespace GTI_Solutionx.Controllers
             Guid guid = Guid.NewGuid();
 
             ViewBag.ExcelGuid = guid.ToString();
-
-            Profile profile = new Profile();
-
-            return View(_context.Amazon.ToList());
+            
+            return View();
         }
 
         public IActionResult BlackList()
@@ -112,7 +110,7 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonDB(string file, MarketPlace marketPlace)
+        public async Task<IActionResult> Upload(string file, MarketPlace marketPlace)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
@@ -124,12 +122,14 @@ namespace GTI_Solutionx.Controllers
 
             var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
-            var amazon = _context.Amazon.ToList();
+            var amazon = _context.Amazon.Where(x => x.marketPlace == marketPlace.ToString()).ToList();
 
             var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
+            var amazonNumber = _context.Amazon.Count();
+
             AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
-                , amazon, shipping, marketPlace);
+                , amazon, shipping, marketPlace, amazonNumber);
             
             try
             {
@@ -137,15 +137,26 @@ namespace GTI_Solutionx.Controllers
             }
             catch (Exception e)
             {
-                return null;
-            }
+                System.IO.File.Delete(path);
+                ViewData["Error"] = e.Message.ToString();
 
-            using (var tran = _context.Database.BeginTransaction())
+                return View();
+            }
+            try
             {
-                await _context.BulkInsertOrUpdateAsync(amazonDBUploader.amazonList);
-                tran.Commit();
+                using (var tran = _context.Database.BeginTransaction())
+                {
+                    await _context.BulkInsertAsync(amazonDBUploader.amazonList);
+                    tran.Commit();
+                }
             }
-
+            catch (Exception e)
+            {
+                System.IO.File.Delete(path);
+                ViewData["Error"] = e.Message.ToString();
+                return View();
+            }
+            
             var memory = new MemoryStream();
 
             using (var stream = new FileStream(path, FileMode.Open))
@@ -161,7 +172,7 @@ namespace GTI_Solutionx.Controllers
                 + Path.GetExtension(path).ToLowerInvariant());
 
             System.IO.File.Delete(path);
-            
+
             return returnFile;
         }
 

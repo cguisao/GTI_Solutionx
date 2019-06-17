@@ -17,19 +17,20 @@ namespace ExcelModifier
         private Dictionary<object, PerfumeWorldWide> perfumeWorldWide1;
         private Dictionary<string, Amazon> amazon;
         private Dictionary<int, double> shipping;
+        private int AmazonCount;
 
         public AmazonDBUploader(string _path, Dictionary<string, Wholesaler_AzImporter> _azImporter, Dictionary<int, Wholesaler_Fragrancex> _fragracex
-            , List<Amazon> _amazon, Dictionary<int, double> _shipping, MarketPlace _marketPlace)
+            , List<Amazon> _amazon, Dictionary<int, double> _shipping, MarketPlace _marketPlace, int _AmazonCount)
         {
             path = _path;
             fragrancexList = _fragracex;
             azImporterList = _azImporter;
             //perfumeWorldWideList = _perfumeWorldWide;
-            amazonList = _amazon;
+            amazonList = new List<Amazon>();
             ShippingList = _shipping;
-            amazonPrintList = new List<Amazon>();
+            amazonPrintList = _amazon;
             marketPlace = _marketPlace;
-            setList();
+            AmazonCount = _AmazonCount;
         }
 
         public AmazonDBUploader(string path, Dictionary<string, Wholesaler_AzImporter> azImporter1, Dictionary<int, Wholesaler_Fragrancex> fragrancex1, Dictionary<object, PerfumeWorldWide> perfumeWorldWide1, Dictionary<string, Amazon> amazon, Dictionary<int, double> shipping)
@@ -103,7 +104,7 @@ namespace ExcelModifier
                                         if (!isInDB(asin))
                                         {
                                             Amazon amazon = new Amazon();
-                                            amazon.id = amazonList.Count + 1;
+                                            amazon.id = ++AmazonCount;
                                             amazon.Asin = asin;
                                             skuID = DigitGetter(rowSku);
                                             //if(skuID == 0)
@@ -121,7 +122,7 @@ namespace ExcelModifier
                                         {
                                             Amazon amazon = new Amazon();
 
-                                            amazon.id = amazonList.Count + 1;
+                                            amazon.id = ++AmazonCount;
                                             amazon.Asin = asin;
                                             sellingPrice = getSellingPrice();
                                             amazon.sku = azImporter.Sku.ToUpper();
@@ -142,8 +143,7 @@ namespace ExcelModifier
 
                     row = 2;
 
-                    foreach (Amazon list in amazonPrintList.Where(x => x.blackList == false 
-                        && x.marketPlace == marketPlace.ToString()).OrderBy(x => x.wholesaler))
+                    foreach (Amazon list in amazonPrintList.Where(x => x.blackList == false).OrderBy(x => x.wholesaler))
                     {
                         Random rnd = new Random();
                         Random rnd2 = new Random();
@@ -173,7 +173,7 @@ namespace ExcelModifier
 
         private bool isInDB(string asin)
         {
-            if(amazonList.Any(x => x.Asin == asin && x.marketPlace == marketPlace.ToString()))
+            if(amazonList.Any(x => x.Asin == asin))
             {
                 return true;
             }
@@ -183,14 +183,6 @@ namespace ExcelModifier
             }
         }
         
-        private void setList()
-        {
-            foreach(var item in amazonList)
-            {
-                amazonPrintList.Add(item);
-            }
-        }
-
         public string getSellingPrice(long? skuID)
         {
             double sellingPrice = 0;
