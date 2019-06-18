@@ -338,7 +338,7 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public IActionResult Updatefragrancex()
+        public IActionResult Update(string file)
         {
             /*
             ServiceTimeStamp service = new ServiceTimeStamp();
@@ -408,10 +408,44 @@ namespace GTI_Solutionx.Controllers
             Helper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
             
             */
+            
+            ServiceTimeStamp service = new ServiceTimeStamp();
 
-            updateFragrancex();
+            var timeStampDB = _context.ServiceTimeStamp
+                                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                                    .LastOrDefault()?.TimeStamp;
+            
+            var timeStampToday = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.Date
+                                , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time")).Date.AddHours(7);
+            
+            if (timeStampDB == null || DateTime.Compare((DateTime)timeStampDB, timeStampToday) < 0 )
+            {
+                try
+                {
+                    FragancexSQLPreparer(service);
+                }
+                catch (Exception e)
+                {
+                    ViewData["Error"] = e.Message.ToString();
+                    return View(_context.ServiceTimeStamp
+                            .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
+                }
 
-            return RedirectToAction("Update");
+            }
+            else
+            {
+                ViewData["Info"] = "Database already updated today after " + timeStampToday;
+                return View(_context.ServiceTimeStamp
+                    .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                        .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
+            }
+
+            ViewData["Success"] = "Database updated successfully at " + TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                    , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            return View(_context.ServiceTimeStamp
+                    .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                        .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [Authorize(Roles = "Admin, user")]
@@ -486,22 +520,6 @@ namespace GTI_Solutionx.Controllers
             return RedirectToAction("Delete");
         }
 
-        private void updateFragrancex()
-        {
-            ServiceTimeStamp service = new ServiceTimeStamp();
-
-            if (_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault<ServiceTimeStamp>() == null)
-            {
-                FragancexSQLPreparer(service);
-            }
-            else if (_context.ServiceTimeStamp.Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault<ServiceTimeStamp>().TimeStamp != DateTime.Today)
-            {
-                FragancexSQLPreparer(service);
-            }
-        }
-
         private void FragancexSQLPreparer(ServiceTimeStamp service)
         {
             var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
@@ -552,8 +570,9 @@ namespace GTI_Solutionx.Controllers
 
                 _context.SaveChanges();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                throw e;
             }
         }
     }

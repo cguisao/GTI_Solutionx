@@ -24,9 +24,41 @@
                             once a day.
                         </p>
 
-                        <form asp-controller="Shopify" asp-action="Updatefragrancex" method="post"
+                        <form asp-controller="Shopify" asp-action="Update" method="post"
                               enctype="multipart/form-data">
-                            <button class="btn btn-primary" type="submit">Update</button>
+                            <div class="text-center m-t-15 invisible">
+                                <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                            </div>
+                            <div class="form-group text-center col-md-12">
+                                <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
+                            </div>
+                            @if (@ViewData["Error"] != null)
+                            {
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Error"]</strong>
+                            </div>
+                            }
+                            @if (@ViewData["Info"] != null)
+                            {
+                            <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-alert-circle font-32"></i>@ViewData["Info"]
+                            </div>
+                            }
+                            @if (@ViewData["Success"] != null)
+                            {
+                            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-checkbox-marked-circle font-32"></i><strong class="pr-1">@ViewData["Success"]</strong>
+                            </div>
+                            }
                         </form>
                     </div>
                 </div>
