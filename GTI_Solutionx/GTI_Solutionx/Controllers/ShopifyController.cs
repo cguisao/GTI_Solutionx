@@ -450,64 +450,101 @@ namespace GTI_Solutionx.Controllers
 
         [Authorize(Roles = "Admin, user")]
         [HttpPost]
-        public async Task<IActionResult> UpdateFragrancexExcel(string file)
+        public async Task<IActionResult> UpdateExcel(string file)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
-
-            DBModifierFragrancexExcel dBModifierFragrancexExcel = new DBModifierFragrancexExcel(path, upc);
-
-            dBModifierFragrancexExcel.TableExecutor();
-
-            // Update the FragrancexList db
-
-            var fragranceTitle = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
-
-            // delete everything from the db, then update
-
-            using (var tran = _context.Database.BeginTransaction())
+            try
             {
-                await _context.BulkDeleteAsync(_context.Wholesaler_Fragrancex.ToList());
-                tran.Commit();
-            }
+                var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
 
-            using (var tran = _context.Database.BeginTransaction())
+                DBModifierFragrancexExcel dBModifierFragrancexExcel = new DBModifierFragrancexExcel(path, upc);
+
+                try
+                {
+                    dBModifierFragrancexExcel.TableExecutor();
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+                // Update the FragrancexList db
+
+                var fragranceTitle = _context.FragrancexTitle.ToDictionary(x => x.ItemID, y => y.Title);
+
+                // delete everything from the db, then update
+                try
+                {
+                    using (var tran = _context.Database.BeginTransaction())
+                    {
+                        await _context.BulkDeleteAsync(_context.Wholesaler_Fragrancex.ToList());
+                        tran.Commit();
+                    }
+
+                    using (var tran = _context.Database.BeginTransaction())
+                    {
+                        await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcel.fragancexList);
+                        tran.Commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+                DBModifierFragrancexExcelList dBModifierFragrancexExcelList = new DBModifierFragrancexExcelList(path, fragranceTitle);
+
+                // insert to the db and update fragranceTitle
+
+                dBModifierFragrancexExcelList.TableExecutor();
+
+                try
+                {
+                    using (var tran = _context.Database.BeginTransaction())
+                    {
+                        await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcelList.fragrance);
+                        tran.Commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+
+                ServiceTimeStamp service = new ServiceTimeStamp();
+
+                service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                    , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+
+                service.Wholesalers = Wholesalers.Fragrancex.ToString();
+
+                service.type = "Excel";
+
+                _context.ServiceTimeStamp.Add(service);
+
+                _context.SaveChanges();
+            }
+            catch(Exception e)
             {
-                await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcel.fragancexList);
-                tran.Commit();
+                System.IO.File.Delete(path);
+
+                ViewData["Error"] = e.Message.ToString();
+                return View(_context.ServiceTimeStamp
+                            .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
             }
-
-            DBModifierFragrancexExcelList dBModifierFragrancexExcelList = new DBModifierFragrancexExcelList(path, fragranceTitle);
-
-            // insert to the db and update fragranceTitle
-
-            dBModifierFragrancexExcelList.TableExecutor();
-
-            using (var tran = _context.Database.BeginTransaction())
-            {
-                await _context.BulkInsertOrUpdateAsync(dBModifierFragrancexExcelList.fragrance);
-                tran.Commit();
-            }
-
-            ServiceTimeStamp service = new ServiceTimeStamp();
-
-            service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
-                , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
-            
-            service.Wholesalers = Wholesalers.Fragrancex.ToString();
-
-            service.type = "Excel";
-
-            _context.ServiceTimeStamp.Add(service);
-
-            _context.SaveChanges();
 
             System.IO.File.Delete(path);
 
-            return RedirectToAction("UpdateExcel");
+            ViewData["Success"] = "Database updated successfully at " + TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                   , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+
+            return View(_context.ServiceTimeStamp
+                        .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                            .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [Authorize(Roles = "Admin, user")]
