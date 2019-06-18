@@ -314,26 +314,36 @@ namespace GTI_Solutions.Controllers
         }
 
         [HttpPost]
-        public IActionResult AzImportsShipping(int Weight, double Price)
+        public IActionResult Shipping(int Weight, double Price)
         {
-            Shipping shipping = new Shipping();
-            shipping.ItemPrice = Price;
-            shipping.weightId = Weight;
-
-            if(_context.Shipping.Any(x => x.weightId == Weight))
+            try
             {
-                _context.Shipping.Update(shipping);
+                Shipping shipping = new Shipping();
+                shipping.ItemPrice = Price;
+                shipping.weightId = Weight;
 
-                _context.SaveChanges();
+                if (_context.Shipping.Any(x => x.weightId == Weight))
+                {
+                    _context.Shipping.Update(shipping);
+
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    _context.Shipping.Add(shipping);
+
+                    _context.SaveChanges();
+                }
             }
-            else
+            catch(Exception e)
             {
-                _context.Shipping.Add(shipping);
-
-                _context.SaveChanges();
+                ViewData["Error"] = e.Message.ToString();
+                return View(_context.Shipping);
             }
 
-            return RedirectToAction("Shipping");
+            ViewData["Success"] = "Database updated successfully!!";
+
+            return View(_context.Shipping);
         }
     }
 }
