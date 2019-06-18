@@ -55,53 +55,68 @@ namespace GTI_Solutions.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAzImportsExcel(string file)
+        public async Task<IActionResult> Index(string file)
         {
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-
-            var azImportItems = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, y => y);
-
-            foreach(var az in azImportItems)
+            try
             {
-                az.Value.Quantity = 0;
+                var azImportItems = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, y => y);
+
+                foreach (var az in azImportItems)
+                {
+                    az.Value.Quantity = 0;
+                }
+
+                DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path, azImportItems);
+
+                AzImporter.TableExecutor();
+
+                // delete everything from the db, then update
+
+                using (var tran = _context.Database.BeginTransaction())
+                {
+                    await _context.BulkDeleteAsync(_context.Wholesaler_AzImporter.ToList());
+                    tran.Commit();
+                }
+
+                using (var tran = _context.Database.BeginTransaction())
+                {
+                    await _context.BulkInsertOrUpdateAsync(AzImporter.azImport);
+                    tran.Commit();
+                }
+
+                ServiceTimeStamp service = new ServiceTimeStamp();
+
+                service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                        , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+
+                service.Wholesalers = Wholesalers.AzImporter.ToString();
+
+                service.type = "Excel";
+
+                _context.ServiceTimeStamp.Add(service);
+
+                _context.SaveChanges();
+
+                System.IO.File.Delete(path);
+            }
+            catch(Exception e)
+            {
+                System.IO.File.Delete(path);
+                ViewData["Error"] = e.Message.ToString();
+                return View(_context.ServiceTimeStamp
+                            .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                                .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
             }
 
-            DBModifierAzImporterExcel AzImporter = new DBModifierAzImporterExcel(path, azImportItems);
-
-            AzImporter.TableExecutor();
-
-            // delete everything from the db, then update
-
-            using (var tran = _context.Database.BeginTransaction())
-            {
-                await _context.BulkDeleteAsync(_context.Wholesaler_AzImporter.ToList());
-                tran.Commit();
-            }
-
-            using (var tran = _context.Database.BeginTransaction())
-            {
-                await _context.BulkInsertOrUpdateAsync(AzImporter.azImport);
-                tran.Commit();
-            }
-
-            ServiceTimeStamp service = new ServiceTimeStamp();
-
-            service.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+            ViewData["Success"] = "Database updated successfully at " + TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
                     , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
 
-            service.Wholesalers = Wholesalers.AzImporter.ToString();
-
-            service.type = "Excel";
-
-            _context.ServiceTimeStamp.Add(service);
-
-            _context.SaveChanges();
-
-            System.IO.File.Delete(path);
-
-            return RedirectToAction("Index");
+            return View(_context.ServiceTimeStamp
+                        .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                            .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
         }
 
         [HttpPost]
