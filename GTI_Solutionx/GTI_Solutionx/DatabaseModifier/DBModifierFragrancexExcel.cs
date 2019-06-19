@@ -13,6 +13,7 @@ namespace DatabaseModifier
         {
             this.path = path;
             this.upc = upc;
+
         }
 
         public List<Wholesaler_Fragrancex> fragancexList = new List<Wholesaler_Fragrancex>();
@@ -20,7 +21,9 @@ namespace DatabaseModifier
         private string path { get; set; }
 
         private Dictionary<int, long?> upc { get; set; }
-        
+
+        private Dictionary<int, int> franDic = new Dictionary<int, int>();
+
         public virtual void TableExecutor()
         {
             
@@ -77,37 +80,41 @@ namespace DatabaseModifier
                         else
                         {
                             exception++;
-
-                            Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
-
-                            fran.id = exception;
-                            fran.Sku = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
-                            fran.BrandName = worksheet.Cells[row, brandName].Value?.ToString();
-                            fran.Description = worksheet.Cells[row, description].Value?.ToString();
-                            fran.Gender = null;
-                            fran.Instock = true;
-                            fran.LargeImageUrl = worksheet.Cells[row, image].Value?.ToString();
-                            fran.MetricSize = null;
-                            fran.ParentCode = null;
-                            fran.ProductName = null;
-                            fran.RetailPriceUSD = 0.0;
-                            fran.Size = null;
-                            fran.SmallImageURL = null;
-                            fran.Type = worksheet.Cells[row, type].Value?.ToString();
-                            fran.WholePriceAUD = 0.0;
-                            fran.WholePriceCAD = 0.0;
-                            fran.WholePriceEUR = 0.0;
-                            fran.WholePriceGBP = 0.0;
-                            fran.WholePriceUSD = Convert.ToDouble(worksheet.Cells[row, price].Value?.ToString());
-
-                            if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString())), out value))
+                            
+                            if(!franDic.ContainsKey(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString())))
                             {
-                                fran.Upc = value;
+                                Wholesaler_Fragrancex fran = new Wholesaler_Fragrancex();
+
+                                fran.id = exception;
+                                fran.Sku = Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString());
+                                fran.BrandName = worksheet.Cells[row, brandName].Value?.ToString();
+                                fran.Description = worksheet.Cells[row, description].Value?.ToString();
+                                fran.Gender = null;
+                                fran.Instock = true;
+                                fran.LargeImageUrl = worksheet.Cells[row, image].Value?.ToString();
+                                fran.MetricSize = null;
+                                fran.ParentCode = null;
+                                fran.ProductName = null;
+                                fran.RetailPriceUSD = 0.0;
+                                fran.Size = null;
+                                fran.SmallImageURL = null;
+                                fran.Type = worksheet.Cells[row, type].Value?.ToString();
+                                fran.WholePriceAUD = 0.0;
+                                fran.WholePriceCAD = 0.0;
+                                fran.WholePriceEUR = 0.0;
+                                fran.WholePriceGBP = 0.0;
+                                fran.WholePriceUSD = Convert.ToDouble(worksheet.Cells[row, price].Value?.ToString());
+
+                                if (upc.TryGetValue(Convert.ToInt32(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString())), out value))
+                                {
+                                    fran.Upc = value;
+                                }
+
+                                fragancexList.Add(fran);
+
+                                franDic.Add(Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString()), Convert.ToInt32(worksheet.Cells[row, itemID].Value?.ToString()));
                             }
-
-                            fragancexList.Add(fran);
                         }
-
                     }
                 }
             }
