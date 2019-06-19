@@ -100,16 +100,19 @@ namespace GTI_Solutions.Controllers
 
                 _context.SaveChanges();
 
-                System.IO.File.Delete(path);
             }
             catch(Exception e)
             {
-                System.IO.File.Delete(path);
+                SetUIValues(path);
+
                 ViewData["Error"] = e.Message.ToString();
+
                 return View(_context.ServiceTimeStamp
                             .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                                 .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
             }
+
+            SetUIValues(path);
 
             ViewData["Success"] = "Database updated successfully at " + TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
                     , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
@@ -117,6 +120,23 @@ namespace GTI_Solutions.Controllers
             return View(_context.ServiceTimeStamp
                         .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
                             .OrderByDescending(x => x.TimeStamp).Take(5).ToList());
+        }
+
+        private void SetUIValues(string path)
+        {
+            System.IO.File.Delete(path);
+
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
+            .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+            .LastOrDefault()?.TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
+
+            ViewBag.type = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.Wholesalers;
         }
 
         [HttpPost]
