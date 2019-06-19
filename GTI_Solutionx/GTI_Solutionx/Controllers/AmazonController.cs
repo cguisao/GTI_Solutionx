@@ -177,43 +177,53 @@ namespace GTI_Solutionx.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAmazonList(string file, MarketPlace marketPlace)
+        public async Task<IActionResult> Index(string file, MarketPlace marketPlace)
         {
-            var path = Path.Combine(
+            try
+            {
+                var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-            
-            var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
 
-            var fragancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
+                var blackListed = _context.Amazon.Where(z => z.blackList == true).ToDictionary(x => x.Asin, y => y.blackList);
 
-            var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
+                var fragancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
 
-            var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
+                var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
-            var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
+                var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
 
-            AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter
-                , blackListed, shipping, perfumeWorldWide, marketPlace);
+                var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
 
-            amazonExcelUpdator.ExcelGenerator();
-            
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
+                AmazonExcelUpdator amazonExcelUpdator = new AmazonExcelUpdator(path, fragancex, azImporter
+                    , blackListed, shipping, perfumeWorldWide, marketPlace);
+
+                amazonExcelUpdator.ExcelGenerator();
+
+                var memory = new MemoryStream();
+
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+
+                memory.Position = 0;
+
+                FileStreamResult returnFile =
+                    File(memory, Helper.GetContentType(path), "Amazon"
+                    + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
+                    + Path.GetExtension(path).ToLowerInvariant());
+
+                System.IO.File.Delete(path);
+
+                return returnFile;
             }
+            catch(Exception e)
+            {
+                ViewData["Error"] = e.Message.ToString();
 
-            memory.Position = 0;
-
-            FileStreamResult returnFile =
-                File(memory, Helper.GetContentType(path), "Amazon"
-                + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
-                + Path.GetExtension(path).ToLowerInvariant());
-
-            System.IO.File.Delete(path);
-
-            return returnFile;
+                return View();
+            }
         }
 
         [HttpPost]

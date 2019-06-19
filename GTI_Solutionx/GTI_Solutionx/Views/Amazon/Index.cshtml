@@ -32,19 +32,26 @@
                             </form>
                         </div>
                     </div>
+                    @if (@ViewData["Error"] != null)
+                    {
+                    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Error"]</strong>
+                    </div>
+                    }
                     <div class="card-body">
-                        <form asp-controller="Amazon" asp-action="UpdateAmazonList" asp-antiforgery="false"
+                        <form asp-controller="Amazon" asp-action="Index" asp-antiforgery="false"
                               enctype="multipart/form-data" name="myForm">
                             <div class="form-row">
                                 <div class="form-group text-center col-md-12">
-                                </div>
-                                <div class="text-center m-t-15 invisible">
-                                    <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
                                 </div>
                                 <div class="form-group text-center col-md-12">
                                     <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
                                 </div>
                             </div>
+                            <input type="hidden" class="form-control invisible" name="file" value="@ViewBag.ExcelGuid">
                         </form>
                     </div>
                 </div>
