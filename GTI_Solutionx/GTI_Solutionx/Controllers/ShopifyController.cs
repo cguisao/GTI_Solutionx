@@ -415,8 +415,8 @@ namespace GTI_Solutionx.Controllers
                                 .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
                                     .LastOrDefault()?.TimeStamp;
             
-            var timeStampToday = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.Date
-                                , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time")).Date.AddHours(7);
+            var timeStampToday = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow
+                                , TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time")).Date.AddHours(5);
             
             if (timeStampDB == null || DateTime.Compare((DateTime)timeStampDB, timeStampToday) < 0 )
             {
