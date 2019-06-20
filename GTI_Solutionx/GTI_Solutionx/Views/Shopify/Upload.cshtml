@@ -53,6 +53,24 @@
                                     <input type="text" class="form-control">
                                 </div>
                             </div>
+                            @if (@ViewData["Error"] != null)
+                             {
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Error"]</strong>
+                            </div>
+                            }
+                            @if (@ViewData["Success"] != null)
+                            {
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Success"]</strong>
+                            </div>
+                            }
                             <div class="text-center m-t-15">
                                 <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
                             </div>

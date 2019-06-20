@@ -62,21 +62,7 @@ namespace GTI_Solutionx.Controllers
         [Authorize(Roles = "Admin, user")]
         public IActionResult Upload()
         {
-            ViewBag.TimeStamp = _context.ServiceTimeStamp
-               .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-               .LastOrDefault().TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
-
-            ViewBag.type = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault().type;
-
-            ViewBag.Wholesalers = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault().Wholesalers;
-
-            Guid guid = Guid.NewGuid();
-
-            ViewBag.ExcelGuid = guid.ToString();
+            UploadUI();
 
             return View(_context.Profile.ToList());
         }
@@ -168,74 +154,87 @@ namespace GTI_Solutionx.Controllers
 
             return returnFile;
         }
-
-
+        
         [HttpPost]
         public IActionResult Upload(string file, string User, Profile profile2)
         {
-            var path = Path.Combine(
+            try
+            {
+                var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
 
-            Profile profile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault();
+                Profile profile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault();
 
-            var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
-            var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
-                .ToDictionary(x => x.sku, y => y.userID);
+                var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
+                var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
+                    .ToDictionary(x => x.sku, y => y.userID);
 
-            ConcurrentDictionary<string, string> shopifyUsersConcurrent =
-                new ConcurrentDictionary<string, string>(shopifyUsers);
+                ConcurrentDictionary<string, string> shopifyUsersConcurrent =
+                    new ConcurrentDictionary<string, string>(shopifyUsers);
 
-            ShopifyExcelCreator shopifyModifier =
-                new ShopifyExcelCreator(profile, shopifyProfile, shopifyUsersConcurrent, path);
+                ShopifyExcelCreator shopifyModifier =
+                    new ShopifyExcelCreator(profile, shopifyProfile, shopifyUsersConcurrent, path);
 
-            try
-            {
-                shopifyModifier.ExcelGenerator();
-            }
-            catch (Exception e)
-            {
-                System.IO.File.Delete(path);
-                return null;
-            }
-
-            var builder = new ConfigurationBuilder()
-                                 .SetBasePath(Directory.GetCurrentDirectory())
-                                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                                 .AddEnvironmentVariables();
-
-            IConfiguration Configuration;
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
-
-            string connectionstring = Configuration.GetConnectionString("DefaultConnection");
-
-            using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
-            {
-                sourceConnection.Open();
                 try
                 {
-                    DBModifierShopifyUserList user =
-                        new DBModifierShopifyUserList(shopifyModifier.shopifyUserTemp, profile);
-                    user.TableExecutor();
-                    // Execute raw query
-                    
-                    var command = sourceConnection.CreateCommand();
-                    command.CommandText = "exec MergeUsersList;";
-                    command.Connection = sourceConnection;
-                    command.ExecuteNonQuery();
-                    sourceConnection.Close();
-                
+                    shopifyModifier.ExcelGenerator();
                 }
                 catch (Exception e)
                 {
-                    sourceConnection.Close();
                     System.IO.File.Delete(path);
-                    return null;
+
+                    throw e;
+                }
+
+                var builder = new ConfigurationBuilder()
+                                     .SetBasePath(Directory.GetCurrentDirectory())
+                                     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                                     .AddEnvironmentVariables();
+
+                IConfiguration Configuration;
+                builder.AddEnvironmentVariables();
+                Configuration = builder.Build();
+
+                string connectionstring = Configuration.GetConnectionString("DefaultConnection");
+
+                using (SqlConnection sourceConnection = new SqlConnection(connectionstring))
+                {
+                    sourceConnection.Open();
+                    try
+                    {
+                        DBModifierShopifyUserList user =
+                            new DBModifierShopifyUserList(shopifyModifier.shopifyUserTemp, profile);
+                        user.TableExecutor();
+                        // Execute raw query
+
+                        var command = sourceConnection.CreateCommand();
+                        command.CommandText = "exec MergeUsersList;";
+                        command.Connection = sourceConnection;
+                        command.ExecuteNonQuery();
+                        sourceConnection.Close();
+
+                    }
+                    catch (Exception e)
+                    {
+                        sourceConnection.Close();
+                        System.IO.File.Delete(path);
+                        throw e;
+                    }
                 }
             }
+            catch(Exception e)
+            {
+                ViewData["Error"] = e.Message.ToString();
 
-            return RedirectToAction("Index");
+                UploadUI();
+
+                return View(_context.Profile.ToList());
+            }
+
+            UploadUI();
+
+            return View(_context.Profile.ToList());
         }
 
         [Authorize(Roles = "Admin, user")]
@@ -244,97 +243,108 @@ namespace GTI_Solutionx.Controllers
             , string fee, string profit, string promoting, string markdown, int items, int min
             , int max, string User)
         {
-            var path = Path.Combine(
-                       Directory.GetCurrentDirectory(), @"wwwroot\Excel_Source\Shopify_Upload.xlsx");
-
-            Match shippingMatch = Regex.Match(shipping, @"[\d]+");
-
-            Match amazonFee = Regex.Match(fee, @"[\d]+[/.]?[\d]+");
-
-            Match promotingFee = Regex.Match(promoting, @"[\d]+[/.]?[\d]+");
-
-            Match profitMatch = Regex.Match(profit, @"[\d]+");
-
-            Profile oldProfile = _context.Profile.AsNoTracking().Where<Profile>(x => x.ProfileUser == User).FirstOrDefault();
-            
-            Profile profile = new Profile
-            {
-                shipping = Double.Parse(shippingMatch.Value),
-
-                fee = Double.Parse(shippingMatch.Value),
-
-                profit = Double.Parse(profitMatch.Value),
-
-                promoting = Double.Parse(promotingFee.Value),
-
-                ProfileUser = User,
-
-                items = items,
-
-                min = min,
-
-                max = max,
-
-                html = oldProfile.html,
-
-                LongstartTitle = oldProfile.LongstartTitle,
-
-                MidtartTitle = oldProfile.MidtartTitle,
-
-                ShortstartTitle = oldProfile.ShortstartTitle,
-
-                endTtile = oldProfile.endTtile,
-
-                sizeDivider = oldProfile.sizeDivider
-
-            };
-            
-            if (markdown != null)
-            {
-                Match markdownMatch = Regex.Match(markdown, @"[\d]+");
-                profile.markdown = Double.Parse(markdownMatch.Value);
-            }
-            
-            var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
-            var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, y => y);
-            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y);
-            var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
-                .ToDictionary(x => x.sku, y => y.userID);
-
-            ConcurrentDictionary<string, string> shopifyUsersConcurrent = 
-                new ConcurrentDictionary<string, string>(shopifyUsers);
-
-            ShopifyExcelCreator shopifyModifier = 
-                new ShopifyExcelCreator(profile, shopifyProfile, fragrancex, shopifyUsersConcurrent, upc, path);
-            
             try
             {
-                shopifyModifier.saveExcel();
+                var path = Path.Combine(
+                       Directory.GetCurrentDirectory(), @"wwwroot\Excel_Source\Shopify_Upload.xlsx");
+
+                Match shippingMatch = Regex.Match(shipping, @"[\d]+");
+
+                Match amazonFee = Regex.Match(fee, @"[\d]+[/.]?[\d]+");
+
+                Match promotingFee = Regex.Match(promoting, @"[\d]+[/.]?[\d]+");
+
+                Match profitMatch = Regex.Match(profit, @"[\d]+");
+
+                Profile oldProfile = _context.Profile.AsNoTracking()
+                                        .Where<Profile>(x => x.ProfileUser == User)
+                                            .FirstOrDefault();
+
+                Profile profile = new Profile
+                {
+                    shipping = Double.Parse(shippingMatch.Value),
+
+                    fee = Double.Parse(shippingMatch.Value),
+
+                    profit = Double.Parse(profitMatch.Value),
+
+                    promoting = Double.Parse(promotingFee.Value),
+
+                    ProfileUser = User,
+
+                    items = items,
+
+                    min = min,
+
+                    max = max,
+
+                    html = oldProfile.html,
+
+                    LongstartTitle = oldProfile.LongstartTitle,
+
+                    MidtartTitle = oldProfile.MidtartTitle,
+
+                    ShortstartTitle = oldProfile.ShortstartTitle,
+
+                    endTtile = oldProfile.endTtile,
+
+                    sizeDivider = oldProfile.sizeDivider
+
+                };
+
+                if (markdown != null)
+                {
+                    Match markdownMatch = Regex.Match(markdown, @"[\d]+");
+                    profile.markdown = Double.Parse(markdownMatch.Value);
+                }
+
+                var shopifyProfile = _context.ShopifyUser.ToDictionary(x => x.sku, x => x);
+                var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, y => y);
+                var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y);
+                var shopifyUsers = _context.UsersList.Where(x => x.userID == profile.ProfileUser)
+                    .ToDictionary(x => x.sku, y => y.userID);
+
+                ConcurrentDictionary<string, string> shopifyUsersConcurrent =
+                    new ConcurrentDictionary<string, string>(shopifyUsers);
+
+                ShopifyExcelCreator shopifyModifier =
+                    new ShopifyExcelCreator(profile, shopifyProfile, fragrancex, shopifyUsersConcurrent, upc, path);
+
+                try
+                {
+                    shopifyModifier.saveExcel();
+                }
+                catch (Exception e)
+                {
+                    System.IO.File.Delete(path);
+                    throw e;
+                }
+
+                var memory = new MemoryStream();
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+
+                memory.Position = 0;
+
+                FileStreamResult returnFile =
+                    File(memory, Helper.GetContentType(path), profile.ProfileUser
+                    + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
+                    + Path.GetExtension(path).ToLowerInvariant());
+
+                _context.Profile.Update(profile);
+
+                _context.SaveChanges();
+
+                return returnFile;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                System.IO.File.Delete(path);
-                return null;
+                ViewData["Error"] = e.Message.ToString();
+
+                return View();
             }
-
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-
-            memory.Position = 0;
-
-            FileStreamResult returnFile =
-                File(memory, Helper.GetContentType(path), profile.ProfileUser
-                + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
-                + Path.GetExtension(path).ToLowerInvariant());
-
-            _context.Profile.Update(profile);
-
-            _context.SaveChanges();
-
-            return returnFile;
         }
 
         [HttpPost]
@@ -549,12 +559,26 @@ namespace GTI_Solutionx.Controllers
 
         [Authorize(Roles = "Admin, user")]
         [HttpPost]
-        public IActionResult DeleteUser(string user)
+        public IActionResult Delete(string user)
         {
-            var users = _context.UsersList.Where(x => x.userID == user).ToList();
-            _context.UsersList.RemoveRange(users);
-            _context.SaveChanges();
-            return RedirectToAction("Delete");
+            try
+            {
+                var users = _context.UsersList.Where(x => x.userID == user).ToList();
+
+                _context.UsersList.RemoveRange(users);
+                
+                _context.SaveChanges();
+
+                ViewData["Success"] = "User " + user + " deleted successfully!!";
+
+                return View(_context.UsersList.Distinct().ToList());
+            }
+            catch(Exception e)
+            {
+                ViewData["Error"] = e.Message.ToString();
+
+                return View(_context.UsersList.Distinct().ToList());
+            }
         }
 
         private void FragancexSQLPreparer(ServiceTimeStamp service)
@@ -611,6 +635,25 @@ namespace GTI_Solutionx.Controllers
             {
                 throw e;
             }
+        }
+
+        private void UploadUI()
+        {
+            ViewBag.TimeStamp = _context.ServiceTimeStamp
+               .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+               .LastOrDefault().TimeStamp.ToString("dd/MM/yyyy HH:mm tt");
+
+            ViewBag.type = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().type;
+
+            ViewBag.Wholesalers = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault().Wholesalers;
+
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
         }
     }
 }

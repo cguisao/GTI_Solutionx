@@ -22,24 +22,6 @@
                             be able to take an excel from an Amazon report and return
                             the items that are available in a spreadsheet.
                         </p>
-                        @if (@ViewData["Error"] != null)
-                        {
-                        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>   
-                            <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Error"]</strong>
-                        </div>
-                        }
-                        @if (@ViewData["Success"] != null)
-                        {
-                        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                            <i class="mdi mdi-checkbox-marked-circle font-32"></i><strong class="pr-1">@ViewData["Success"]</strong>
-                        </div>
-                        }
                         <div id="dropzone">
                             <form asp-controller="Home" asp-action="DropzoneFileUpload" asp-antiforgery="false"
                                   class="dropzone" id="myAwesomeDropzone" enctype="multipart/form-data">
@@ -54,9 +36,25 @@
                         </div>
                         <form asp-controller="AzImporter" asp-action="Index" asp-antiforgery="false"
                               enctype="multipart/form-data">
-                            <div class="text-center m-t-15 invisible">
-                                <input type="text" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                            <input type="hidden" class="form-control" name="file" value="@ViewBag.ExcelGuid">
+                            @if (@ViewData["Error"] != null)
+                            {
+                            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>   
+                                <i class="mdi mdi-close-circle font-32"></i><strong class="pr-1">@ViewData["Error"]</strong>
                             </div>
+                            }
+                            @if (@ViewData["Success"] != null)
+                            {
+                            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <i class="mdi mdi-checkbox-marked-circle font-32"></i><strong class="pr-1">@ViewData["Success"]</strong>
+                            </div>
+                            }
                             <div class="text-center m-t-15">
                                 <button type="submit" class="btn btn-primary waves-effect waves-light">Submit</button>
                             </div>

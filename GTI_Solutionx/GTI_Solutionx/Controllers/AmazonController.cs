@@ -26,46 +26,8 @@ namespace GTI_Solutionx.Controllers
         
         public IActionResult Upload()
         {
-            ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
+            UploadUI();
 
-            ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
-                .LastOrDefault()?.type;
-
-            ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
-
-            ViewBag.typeAzImport = _context.ServiceTimeStamp
-                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
-                .LastOrDefault()?.type;
-
-            ViewBag.amazonUS = _context.Amazon.Where(x => x.blackList != true 
-                                        && x.marketPlace == MarketPlace.US.ToString()).Count();
-
-            ViewBag.amazonUK = _context.Amazon.Where(x => x.blackList != true
-                                        && x.marketPlace == MarketPlace.UK.ToString()).Count();
-
-            ViewBag.amazonJP = _context.Amazon.Where(x => x.blackList != true
-                                        && x.marketPlace == MarketPlace.JP.ToString()).Count();
-
-            ViewBag.amazonAU = _context.Amazon.Where(x => x.blackList != true
-                                        && x.marketPlace == MarketPlace.AU.ToString()).Count();
-
-            ViewBag.amazonFragrancex = _context.Amazon.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()
-                                         && x.blackList != true).Count();
-
-            ViewBag.amazonAzImporter = _context.Amazon.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()
-                                        && x.blackList != true).Count();
-
-            ViewBag.amazonBlackListed = _context.Amazon.Where(x => x.blackList == true).Count();
-
-            Guid guid = Guid.NewGuid();
-
-            ViewBag.ExcelGuid = guid.ToString();
-            
             return View();
         }
 
@@ -115,65 +77,120 @@ namespace GTI_Solutionx.Controllers
             var path = Path.Combine(
                         Directory.GetCurrentDirectory(), "wwwroot",
                         file + ".xlsx");
-            
-            var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
-
-            //var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
-
-            var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
-
-            var amazon = _context.Amazon.Where(x => x.marketPlace == marketPlace.ToString()).ToList();
-
-            var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
-
-            var amazonNumber = _context.Amazon.Count();
-
-            AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
-                , amazon, shipping, marketPlace, amazonNumber);
-            
             try
             {
-                amazonDBUploader.ExcelGenerator();
-            }
-            catch (Exception e)
-            {
-                System.IO.File.Delete(path);
-                ViewData["Error"] = e.Message.ToString();
+                var azImporter = _context.Wholesaler_AzImporter.ToDictionary(x => x.Sku, x => x);
 
-                return View();
-            }
-            try
-            {
-                using (var tran = _context.Database.BeginTransaction())
+                //var perfumeWorldWide = _context.PerfumeWorldWide.ToDictionary(x => x.sku, x => x);
+
+                var fragrancex = _context.Wholesaler_Fragrancex.ToDictionary(x => x.Sku, x => x);
+
+                var amazon = _context.Amazon.Where(x => x.marketPlace == marketPlace.ToString()).ToList();
+
+                var shipping = _context.Shipping.ToDictionary(x => x.weightId, x => x.ItemPrice);
+
+                var amazonNumber = _context.Amazon.Count();
+
+                AmazonDBUploader amazonDBUploader = new AmazonDBUploader(path, azImporter, fragrancex
+                    , amazon, shipping, marketPlace, amazonNumber);
+
+                try
                 {
-                    await _context.BulkInsertAsync(amazonDBUploader.amazonList);
-                    tran.Commit();
+                    amazonDBUploader.ExcelGenerator();
                 }
+                catch (Exception e)
+                {
+                    System.IO.File.Delete(path);
+                    ViewData["Error"] = e.Message.ToString();
+
+                    return View();
+                }
+                try
+                {
+                    using (var tran = _context.Database.BeginTransaction())
+                    {
+                        await _context.BulkInsertAsync(amazonDBUploader.amazonList);
+                        tran.Commit();
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.IO.File.Delete(path);
+                    ViewData["Error"] = e.Message.ToString();
+                    return View();
+                }
+
+                var memory = new MemoryStream();
+
+                using (var stream = new FileStream(path, FileMode.Open))
+                {
+                    await stream.CopyToAsync(memory);
+                }
+
+                memory.Position = 0;
+
+                FileStreamResult returnFile =
+                    File(memory, Helper.GetContentType(path), "Amazon"
+                        + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
+                            + marketPlace.ToString() + Path.GetExtension(path).ToLowerInvariant());
+
+                System.IO.File.Delete(path);
+
+                return returnFile;
             }
-            catch (Exception e)
+            catch(Exception)
             {
                 System.IO.File.Delete(path);
-                ViewData["Error"] = e.Message.ToString();
+
+                ViewData["Error"] = "The ASIN and/or Market Place is NOT in the database.";
+
+                UploadUI();
+
                 return View();
             }
-            
-            var memory = new MemoryStream();
+        }
 
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
+        private void UploadUI()
+        {
+            ViewBag.TimeStampFragrancex = _context.ServiceTimeStamp
+                            .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                            .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
 
-            memory.Position = 0;
-            
-            FileStreamResult returnFile =
-                File(memory, Helper.GetContentType(path), "Amazon"
-                + "_Converted_" + DateTime.Today.GetDateTimeFormats()[10]
-                + Path.GetExtension(path).ToLowerInvariant());
+            ViewBag.typeAzFragrancex = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.Fragrancex.ToString())
+                .LastOrDefault()?.type;
 
-            System.IO.File.Delete(path);
+            ViewBag.TimeStampAzImport = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.TimeStamp.ToString("MM/dd/yyyy hh:mm tt");
 
-            return returnFile;
+            ViewBag.typeAzImport = _context.ServiceTimeStamp
+                .Where(x => x.Wholesalers == Wholesalers.AzImporter.ToString())
+                .LastOrDefault()?.type;
+
+            ViewBag.amazonUS = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.US.ToString()).Count();
+
+            ViewBag.amazonUK = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.UK.ToString()).Count();
+
+            ViewBag.amazonJP = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.JP.ToString()).Count();
+
+            ViewBag.amazonAU = _context.Amazon.Where(x => x.blackList != true
+                                        && x.marketPlace == MarketPlace.AU.ToString()).Count();
+
+            ViewBag.amazonFragrancex = _context.Amazon.Where(x => x.wholesaler == Wholesalers.Fragrancex.ToString()
+                                         && x.blackList != true).Count();
+
+            ViewBag.amazonAzImporter = _context.Amazon.Where(x => x.wholesaler == Wholesalers.AzImporter.ToString()
+                                        && x.blackList != true).Count();
+
+            ViewBag.amazonBlackListed = _context.Amazon.Where(x => x.blackList == true).Count();
+
+            Guid guid = Guid.NewGuid();
+
+            ViewBag.ExcelGuid = guid.ToString();
         }
 
         [HttpPost]
