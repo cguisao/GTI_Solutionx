@@ -239,7 +239,7 @@ namespace GTI_Solutionx.Controllers
 
         [Authorize(Roles = "Admin, user")]
         [HttpPost]
-        public async Task<IActionResult> ExportToExcel(string file, string shipping
+        public async Task<IActionResult> Index(string file, string shipping
             , string fee, string profit, string promoting, string markdown, int items, int min
             , int max, string User)
         {
