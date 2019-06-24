@@ -14,6 +14,8 @@ using GTI_Solutionx.Services;
 using GTI_Solutionx.Models.AccountViewModels;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.Net.Http.Headers;
 
 namespace GTI_Solutionx
 {
@@ -74,6 +76,27 @@ namespace GTI_Solutionx
             });
 
             services.AddMvc();
+
+            services.AddResponseCompression();
+            
+            services.AddResponseCompression(options =>
+            {
+                 IEnumerable<string> MimeTypes = new[]
+                 {
+                     // General
+                     "text/plain",
+                     "text/html",
+                     "text/css",
+                     "font/woff2",
+                     "application/javascript",
+                     "image/x-icon",
+                     "image/png"
+                 };
+                 options.EnableForHttps = true;
+                 options.MimeTypes = MimeTypes;
+                 options.Providers.Add<GzipCompressionProvider>();
+                 options.Providers.Add<BrotliCompressionProvider>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -91,14 +114,24 @@ namespace GTI_Solutionx
             }
 
             app.UseAuthentication();
-
-            app.UseStaticFiles();
-
+            
             app.UseRewriter(new RewriteOptions()
             .AddRedirectToHttps()
             );
 
             app.UseHttpsRedirection();
+
+            app.UseResponseCompression();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    const int durationInSeconds = 60 * 60 * 24;
+                    ctx.Context.Response.Headers[HeaderNames.CacheControl] =
+                        "public,max-age=" + durationInSeconds;
+                }
+            });
 
             app.UseMvc(routes =>
             {
