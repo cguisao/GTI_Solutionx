@@ -33,18 +33,6 @@ namespace ExcelModifier
             AmazonCount = _AmazonCount;
         }
 
-        public AmazonDBUploader(string path, Dictionary<string, Wholesaler_AzImporter> azImporter1, Dictionary<int, Wholesaler_Fragrancex> fragrancex1, Dictionary<object, PerfumeWorldWide> perfumeWorldWide1, Dictionary<string, Amazon> amazon, Dictionary<int, double> shipping)
-        {
-            this.path = path;
-            this.azImporter1 = azImporter1;
-            this.fragrancex1 = fragrancex1;
-            this.perfumeWorldWide1 = perfumeWorldWide1;
-            this.amazon = amazon;
-            this.shipping = shipping;
-        }
-
-        //public List<Amazon> amazon = 
-
         public void ExcelGenerator()
         {
             FileInfo file = new FileInfo(path);
