@@ -12,7 +12,7 @@ using OfficeOpenXml;
 
 namespace ExcelModifier
 {
-    public class ShopifyExcelCreator : DBRawQueries, IExcelExtension, IDatabaseModifier
+    public class ShopifyExcelCreator 
     {
         public ShopifyExcelCreator(Profile _profile, Dictionary<string, ShopifyUser> _shopifyProfile
             , Dictionary<int, Wholesaler_Fragrancex> _fragrancex, ConcurrentDictionary<string, string> _shopifyUser
@@ -71,9 +71,7 @@ namespace ExcelModifier
                     listCreator(worksheet);
 
                     setTitleDic();
-
-                    tableExecutor();
-
+                    
                     package.Save();
 
                 }
@@ -240,18 +238,6 @@ namespace ExcelModifier
             catch (Exception ex)
             {
                 throw ex;
-            }
-        }
-
-        public void tableExecutor()
-        {
-            try
-            {
-                TableExecutor();
-            }
-            catch (Exception e)
-            {
-                throw e;
             }
         }
 
@@ -544,74 +530,6 @@ namespace ExcelModifier
                 throw e;
             }
         }
-
-        public DataTable CreateTable()
-        {
-            DataTable shopifyUserTable = new DataTable("Amazon");
-
-            ColumnMaker(shopifyUserTable, "ItemID", "System.Int32");
-            //ColumnMaker(shopifyUserTable, "body", "System.String");
-            ColumnMaker(shopifyUserTable, "collection", "System.String");
-            //ColumnMaker(shopifyUserTable, "comparePrice", "System.Double");
-            ColumnMaker(shopifyUserTable, "handle", "System.String");
-            ColumnMaker(shopifyUserTable, "image", "System.String");
-            //ColumnMaker(shopifyUserTable, "option1Name", "System.String");
-            ColumnMaker(shopifyUserTable, "option1Value", "System.String");
-            //ColumnMaker(shopifyUserTable, "price", "System.Double");
-            ColumnMaker(shopifyUserTable, "sku", "System.String");
-            ColumnMaker(shopifyUserTable, "tags", "System.String");
-            ColumnMaker(shopifyUserTable, "title", "System.String");
-            ColumnMaker(shopifyUserTable, "type", "System.String");
-            //ColumnMaker(shopifyUserTable, "upc", "System.Int64");
-            ColumnMaker(shopifyUserTable, "vendor", "System.String");
-            //ColumnMaker(shopifyUserTable, "user", "System.String");
-
-            return shopifyUserTable;
-        }
-
-        public void TableExecutor()
-        {
-            DataTable uploadShopifyUser = CreateTable();
-            int bulkSize = 0;
-            try
-            {
-                foreach (var profile in shopifyProfile)
-                {
-                    DataRow insideRow = uploadShopifyUser.NewRow();
-
-                    insideRow["ItemID"] = bulkSize + 1;
-                    insideRow["sku"] = profile.Value.sku;
-                    insideRow["handle"] = profile.Value.handle;
-                    insideRow["title"] = profile.Value.title;
-                    //insideRow["body"] = profile.Value.body;
-                    insideRow["vendor"] = profile.Value.vendor;
-                    insideRow["type"] = profile.Value.type;
-                    //insideRow["option1Name"] = profile.Value.option1Name;
-                    insideRow["option1Value"] = profile.Value.option1Value;
-                    //insideRow["price"] = profile.Value.price;
-                    //insideRow["comparePrice"] = profile.Value.comparePrice;
-                    insideRow["image"] = profile.Value.image;
-                    insideRow["tags"] = profile.Value.tags;
-                    insideRow["collection"] = profile.Value.collection;
-                    //if(profile.Value.upc != null)
-                    //{
-                    //    insideRow["upc"] = profile.Value.upc;
-                    //}
-                    //insideRow["user"] = profile.Value.userID;
-
-                    uploadShopifyUser.Rows.Add(insideRow);
-                    uploadShopifyUser.AcceptChanges();
-                    bulkSize++;
-                }
-
-                upload(uploadShopifyUser, bulkSize, "dbo.ShopifyUser");
-            }
-            catch(Exception e)
-            {
-                throw e;
-            }   
-        }
-
         
     }
 }

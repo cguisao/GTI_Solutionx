@@ -7,7 +7,7 @@ using System.IO;
 
 namespace DatabaseModifier
 {
-    public class DBModifierAzImporterExcel : Database, IDatabaseModifier
+    public class DBModifierAzImporterExcel
     {
         public DBModifierAzImporterExcel(string _path, Dictionary<string, Wholesaler_AzImporter> _azImportItems)
         {
@@ -21,32 +21,6 @@ namespace DatabaseModifier
 
         public List<Wholesaler_AzImporter> azImport = new List<Wholesaler_AzImporter>();
         
-        public DataTable CreateTable()
-        {
-            DataTable azImporterTable = new DataTable("AzImporter");
-
-            ColumnMaker(azImporterTable, "ItemID", "System.Int32");
-            ColumnMaker(azImporterTable, "Category", "System.String");
-            ColumnMaker(azImporterTable, "HTMLDescription", "System.String");
-            ColumnMaker(azImporterTable, "Image1", "System.String");
-            ColumnMaker(azImporterTable, "Image2", "System.String");
-            ColumnMaker(azImporterTable, "Image3", "System.String");
-            ColumnMaker(azImporterTable, "Image4", "System.String");
-            ColumnMaker(azImporterTable, "Image5", "System.String");
-            ColumnMaker(azImporterTable, "Image6", "System.String");
-            ColumnMaker(azImporterTable, "Image7", "System.String");
-            ColumnMaker(azImporterTable, "Image8", "System.String");
-            ColumnMaker(azImporterTable, "itemName", "System.String");
-            ColumnMaker(azImporterTable, "MainImage", "System.String");
-            ColumnMaker(azImporterTable, "Quantity", "System.Int32");
-            ColumnMaker(azImporterTable, "ShortDescription", "System.String");
-            ColumnMaker(azImporterTable, "Sku", "System.String");
-            ColumnMaker(azImporterTable, "Weight", "System.Int32");
-            ColumnMaker(azImporterTable, "WholeSale", "System.Double");
-
-            return azImporterTable;
-        }
-
         private void TableCreator()
         {
             FileInfo file = new FileInfo(path);
@@ -110,9 +84,7 @@ namespace DatabaseModifier
         public void TableExecutor()
         {
             TableCreator();
-
-            DataTable uploadAzImporter = CreateTable();
-
+            
             int bulkSize = 1;
 
             int exception = 0;

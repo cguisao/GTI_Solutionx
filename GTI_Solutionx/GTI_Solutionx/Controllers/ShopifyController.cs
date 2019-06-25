@@ -349,76 +349,7 @@ namespace GTI_Solutionx.Controllers
 
         [HttpPost]
         public IActionResult Update(string file)
-        {
-            /*
-            ServiceTimeStamp service = new ServiceTimeStamp();
-
-            DataTable uploadFragrancex = Helper.MakeFragrancexTable();
-
-            var list = _context.Fragrancex.ToList();
-
-            var upc = _context.UPC.ToDictionary(x => x.ItemID, y => y.Upc);
-
-            long? value;
-            
-            int bulkSize = 0;
-            
-            Fragrancex fragrancex = new Fragrancex();
-
-            //SDK Test and it works
-
-            var listingApiClient = new FrgxListingApiClient("346c055aaefd", "a5574c546cbbc9c10509e3c277dd7c7039b24324");
-
-            var product = listingApiClient.GetProductById("412492");
-
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-
-            dic.Add(product.ItemId, product.ProductName);
-
-            try
-            {
-                dic.Add(product.ItemId, product.ProductName);
-                DataRow insideRow = uploadFragrancex.NewRow();
-
-                insideRow["ItemID"] = Convert.ToInt32(product.ItemId);
-                insideRow["BrandName"] = product.BrandName;
-                insideRow["Description"] = product.Description;
-                insideRow["Gender"] = product.Gender;
-                insideRow["Instock"] = product.Instock;
-                insideRow["LargeImageUrl"] = product.LargeImageUrl;
-                insideRow["MetricSize"] = product.MetricSize;
-                insideRow["ParentCode"] = product.ParentCode;
-                insideRow["ProductName"] = product.ProductName;
-                insideRow["RetailPriceUSD"] = product.RetailPriceUSD;
-                insideRow["Size"] = product.Size;
-                insideRow["SmallImageURL"] = product.SmallImageUrl;
-                insideRow["Type"] = product.Type;
-                insideRow["WholePriceAUD"] = product.WholesalePriceAUD;
-                insideRow["WholePriceCAD"] = product.WholesalePriceCAD;
-                insideRow["WholePriceEUR"] = product.WholesalePriceEUR;
-                insideRow["WholePriceGBP"] = product.WholesalePriceGBP;
-                insideRow["WholePriceUSD"] = product.WholesalePriceUSD;
-
-                if (upc.TryGetValue(Convert.ToInt32(product.ItemId), out value))
-                {
-                    insideRow["Upc"] = value;
-                }
-
-                insideRow["UpcItemID"] = Convert.ToInt32(product.ItemId);
-
-                uploadFragrancex.Rows.Add(insideRow);
-                uploadFragrancex.AcceptChanges();
-                bulkSize++;
-            }
-            catch
-            {
-                
-            }
-            
-            Helper.upload(uploadFragrancex, bulkSize, "dbo.Fragrancex");
-            
-            */
-            
+        {   
             ServiceTimeStamp service = new ServiceTimeStamp();
 
             var timeStampDB = _context.ServiceTimeStamp

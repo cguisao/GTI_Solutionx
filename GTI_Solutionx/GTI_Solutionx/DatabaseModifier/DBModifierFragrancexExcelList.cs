@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DatabaseModifier
 {
-    public class DBModifierFragrancexExcelList : Database, IDatabaseModifier
+    public class DBModifierFragrancexExcelList
     {
         public DBModifierFragrancexExcelList(string path, Dictionary<int, string> _fragranceTitle)
         {
@@ -23,22 +23,10 @@ namespace DatabaseModifier
 
         private string path { get; set; }
 
-        public DataTable CreateTable()
-        {
-            DataTable fragrancexTable = new DataTable("FragrancexTitle");
-
-            ColumnMaker(fragrancexTable, "ItemID", "System.Int32");
-            ColumnMaker(fragrancexTable, "Title", "System.String");
-
-            return fragrancexTable;
-        }
-
         public virtual void TableExecutor()
         {
             FileInfo file = new FileInfo(path);
-
-            DataTable uploadFragrancexTitle = CreateTable();
-
+            
             int bulkSize = 0;
 
             int exception = 0;

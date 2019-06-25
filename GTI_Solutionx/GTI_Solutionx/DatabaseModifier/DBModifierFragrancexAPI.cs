@@ -6,9 +6,9 @@ using GTI_Solutionx.Models.Dashboard;
 
 namespace DatabaseModifier
 {
-    public class DBModifierFragrancexAPI : DBModifierFragrancexExcel, IDatabaseModifier
+    public class DBModifierFragrancexAPI
     {
-        public DBModifierFragrancexAPI(string path, Dictionary<int, long?> upc) : base(path, upc)
+        public DBModifierFragrancexAPI(string path, Dictionary<int, long?> upc)
         {
             this.upc = upc;
         }
@@ -19,7 +19,7 @@ namespace DatabaseModifier
 
         public List<Wholesaler_Fragrancex> fragrancex = new List<Wholesaler_Fragrancex>();
 
-        public override void TableExecutor()
+        public void TableExecutor()
 
         {
             long? value = 0;
@@ -76,9 +76,5 @@ namespace DatabaseModifier
 
         }
 
-        public DataTable CreateTable()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
